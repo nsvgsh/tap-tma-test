@@ -610,6 +610,7 @@ export default function Home() {
                     const unlock = readUnlockForTask(taskId)
                     return unlock ? Math.max(0, Math.ceil((unlock.expiresAt - nowTick) / 1000)) : null
                   }}
+                  userLevel={counters?.level ?? 0}
                 />
               </div>
             </ScreenContainer>
