@@ -5,6 +5,7 @@ import { LevelUpModal } from '@/ui/Modal/Modal'
 import { normalizeCounters, parsePublicConfig, fetchJsonWithRetry, type CountersNormalized } from '../lib/apiClient'
 import { isMonetagLoaded, loadMonetagSdk, showRewardedInterstitial, categorizeMonetagError } from '../lib/ads/monetag'
 import { showNotice } from '../lib/notice'
+import { TapBatcher, type TapEvent, type BatchConfig } from '../lib/tapBatching'
 import { BottomNavShadow } from '@/ui/BottomNav/BottomNavShadow'
 import { EarnGrid } from '@/ui/earn/EarnGrid/EarnGrid'
 import { Wallet } from '@/ui/wallet/Wallet/Wallet'
@@ -81,6 +82,8 @@ export default function Home() {
   // const [unlockPolicy, setUnlockPolicy] = useState<'any'|'valued'>('any')
   const [logFailedAdEvents, setLogFailedAdEvents] = useState<boolean>(true)
   const [batchMinIntervalMs, setBatchMinIntervalMs] = useState<number>(100)
+  const [tapBatcher, setTapBatcher] = useState<TapBatcher | null>(null)
+  const [tapBatcherInitialized, setTapBatcherInitialized] = useState<boolean>(false)
   const [pendingBonusConfirm, setPendingBonusConfirm] = useState<boolean>(false)
   const [bonusImpressionId, setBonusImpressionId] = useState<string | null>(null)
   const [bonusExpiresAt, setBonusExpiresAt] = useState<number | null>(null)
@@ -135,22 +138,54 @@ export default function Home() {
     await loadCounters()
   }
 
-  async function tap() {
-    if (!session) return
-    const nextSeq = clientSeq + 1
-  const { ok, json } = await fetchJsonWithRetry<unknown>('/api/v1/ingest/taps', {
+  // Instant UI feedback for taps
+  const handleInstantTapFeedback = useCallback((tapCount: number) => {
+    // Calculate coins per tap from current multiplier
+    // We'll use a fixed multiplier for instant feedback, server will correct it
+    const coinsPerTap = 1 // Fixed at 1 coin per tap for instant feedback
+    
+    setCounters(prev => {
+      if (!prev) return null
+      return {
+        ...prev,
+        coins: prev.coins + (tapCount * coinsPerTap),
+        totalTaps: prev.totalTaps + tapCount
+      }
+    })
+  }, []) // No dependencies - use functional update
+
+  // Process batched taps
+  const processTapBatch = useCallback(async (taps: TapEvent[]) => {
+    if (!session || taps.length === 0) return
+    
+    const batchSize = taps.length
+    const lastTap = taps[taps.length - 1]
+    
+    
+    // Send batch as single request
+    const { ok, json } = await fetchJsonWithRetry<unknown>('/api/v1/ingest/taps', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ taps: 1, clientSeq: nextSeq, sessionId: session.sessionId, sessionEpoch: session.sessionEpoch }),
+      body: JSON.stringify({ 
+        taps: batchSize, 
+        clientSeq: lastTap.clientSeq, 
+        sessionId: session.sessionId, 
+        sessionEpoch: session.sessionEpoch 
+      }),
     }, {
       retry429DelayMs: batchMinIntervalMs,
       onOutdated: async () => { await resumeOrStartSession() },
     })
+    
     if (ok) {
       const data = json as { counters: unknown; nextThreshold?: NextThreshold; leveledUp?: { level: number } | null }
       const c = normalizeCounters(data.counters)
       setCounters(c)
-      setClientSeq(nextSeq)
+      setClientSeq(lastTap.clientSeq)
+      // Update the batcher's client sequence
+      if (tapBatcher) {
+        tapBatcher.updateClientSeq(lastTap.clientSeq)
+      }
       setLeveledUp(data?.leveledUp?.level ?? null)
       if (data?.leveledUp?.level) {
         try { await refreshDebug() } catch {}
@@ -164,6 +199,14 @@ export default function Home() {
         showNotice('Something went wrong. Please try again.')
       }
     }
+  }, [session, batchMinIntervalMs])
+
+  // New tap function using batching
+  function tap() {
+    if (!session || !tapBatcher) {
+        return
+      }
+    tapBatcher.addTap(session.sessionId, session.sessionEpoch)
   }
 
   // removed unused claimBonus
@@ -478,7 +521,21 @@ export default function Home() {
         setLogFailedAdEvents(Boolean(cfg.logFailedAdEvents))
       } catch {}
     })()
-  }, [])
+  }, []) // Empty dependency array - only run once on mount
+
+  // Initialize TapBatcher when dependencies are ready
+  useEffect(() => {
+    if (session && processTapBatch && handleInstantTapFeedback && !tapBatcherInitialized) {
+      const batchConfig: BatchConfig = {
+        maxBatchSize: 4, // Batch every 4 taps
+        maxBatchDelayMs: 200, // Or after 200ms delay
+        batchMinIntervalMs: batchMinIntervalMs
+      }
+        const batcher = new TapBatcher(batchConfig, processTapBatch, handleInstantTapFeedback, clientSeq)
+        setTapBatcher(batcher)
+        setTapBatcherInitialized(true)
+    }
+  }, [session, processTapBatch, handleInstantTapFeedback, tapBatcherInitialized, batchMinIntervalMs]) // Removed clientSeq from dependencies
 
   // Wallet: hydrate address from sessionStorage
   useEffect(() => {
@@ -536,6 +593,29 @@ export default function Home() {
       void loadTasks()
     }
   }, [counters?.level])
+
+  // Update tap batcher config when batchMinIntervalMs changes
+  useEffect(() => {
+    if (tapBatcher) {
+      tapBatcher.updateConfig({ batchMinIntervalMs })
+    }
+  }, [tapBatcher, batchMinIntervalMs])
+
+  // Update tap batcher clientSeq when it changes
+  useEffect(() => {
+    if (tapBatcher && session) {
+      tapBatcher.updateClientSeq(clientSeq)
+    }
+  }, [tapBatcher, clientSeq, session])
+
+  // Cleanup tap batcher on unmount
+  useEffect(() => {
+    return () => {
+      if (tapBatcher) {
+        tapBatcher.flush() // Process any remaining taps
+      }
+    }
+  }, [tapBatcher])
 
   if (!mounted) {
     return (
