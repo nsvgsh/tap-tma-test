@@ -50,3 +50,8 @@
 | UI-LEVELUP-MODAL-POLISH-001 | Constrained modal to 420px, added 3-row grid (50/30/20), tokenized colors/typography, extracted RewardPill, removed inline styles |
 | ENV-0001 | Added DATABASE_URL to docs/env.example; setup script now includes it for web/.env.local |
 | UI-EARN-WIDE-BUTTON-001 | Added wide button "SIGN UP FOR FREE TRIAL" for first level users in EARN section |
+| UI-EARN-NOTIFICATIONS-1 | Added red dot notification indicator to EARN icon in bottom navigation |
+| UI-EARN-NOTIFICATIONS-2 | Implemented shaking animation for EARN icon when new tasks appear |
+| UI-EARN-NOTIFICATIONS-3 | Added logic to track when new tasks appear (on level up) and manage notification state |
+| UI-EARN-NOTIFICATIONS-4 | Stop shaking after 5 taps or when user enters EARN section |
+| UI-EARN-NOTIFICATIONS-5 | Remove red dot only when user enters EARN section |

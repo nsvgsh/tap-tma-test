@@ -3,7 +3,17 @@ import React, { useEffect, useRef } from 'react'
 
 type TabKey = 'home' | 'offers' | 'wallet'
 
-export function BottomNavShadow({ active, onSelect }: { active: TabKey; onSelect: (k: TabKey) => void }) {
+export function BottomNavShadow({ 
+  active, 
+  onSelect, 
+  earnNotificationVisible = false, 
+  earnShaking = false 
+}: { 
+  active: TabKey
+  onSelect: (k: TabKey) => void
+  earnNotificationVisible?: boolean
+  earnShaking?: boolean
+}) {
   const hostRef = useRef<HTMLDivElement | null>(null)
   const shadowRef = useRef<ShadowRoot | null>(null)
 
@@ -60,6 +70,26 @@ export function BottomNavShadow({ active, onSelect }: { active: TabKey; onSelect
 
         btn.appendChild(bg)
         btn.appendChild(overlay)
+
+        // Add notification elements for EARN button
+        if (key === 'offers') {
+          // Red dot notification
+          const notificationDot = document.createElement('div')
+          notificationDot.className = 'notification-dot'
+          notificationDot.style.cssText = `
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 12px;
+            height: 12px;
+            background: #ff4444;
+            border-radius: 50%;
+            border: 2px solid #ffffff;
+            z-index: 10;
+            display: ${earnNotificationVisible ? 'block' : 'none'};
+          `
+          btn.appendChild(notificationDot)
+        }
 
         btn.setAttribute('data-key', key)
         return btn
@@ -130,12 +160,27 @@ export function BottomNavShadow({ active, onSelect }: { active: TabKey; onSelect
         btn.removeAttribute('aria-current')
         btn.setAttribute('aria-selected', 'false')
       }
+      
+      // Update EARN notifications
+      if (key === 'offers') {
+        const notificationDot = btn.querySelector('.notification-dot') as HTMLElement
+        if (notificationDot) {
+          notificationDot.style.display = earnNotificationVisible ? 'block' : 'none'
+        }
+        
+        // Add/remove shaking class
+        if (earnShaking) {
+          btn.classList.add('earn-shaking')
+        } else {
+          btn.classList.remove('earn-shaking')
+        }
+      }
     })
     return () => {
       try { window.removeEventListener('resize', recomputeHeight) } catch {}
       try { ro.disconnect() } catch {}
     }
-  }, [active, onSelect])
+  }, [active, onSelect, earnNotificationVisible, earnShaking])
 
   return (
     <div

@@ -93,6 +93,12 @@ export default function Home() {
   const [walletAddress, setWalletAddress] = useState<string | null>(null)
   // const [walletTab, setWalletTab] = useState<'withdrawals' | 'activity' | 'airdrop'>('withdrawals')
   const [claimSuccess, setClaimSuccess] = useState<{ taskId: string; rewardPayload: Record<string, unknown> | null } | null>(null)
+  
+  // EARN notifications state
+  const [earnNotificationVisible, setEarnNotificationVisible] = useState<boolean>(false)
+  const [earnShaking, setEarnShaking] = useState<boolean>(false)
+  const [tapCount, setTapCount] = useState<number>(0)
+  const [lastEarnVisitLevel, setLastEarnVisitLevel] = useState<number | null>(null)
 
   async function devLogin() {
     const token = process.env.NEXT_PUBLIC_DEV_TOKEN || process.env.DEV_TOKEN || ''
@@ -207,6 +213,17 @@ export default function Home() {
         return
       }
     tapBatcher.addTap(session.sessionId, session.sessionEpoch)
+    
+    // Track taps for EARN notification dismissal
+    if (earnShaking) {
+      setTapCount(prev => {
+        const newCount = prev + 1
+        if (newCount >= 5) {
+          setEarnShaking(false)
+        }
+        return newCount
+      })
+    }
   }
 
   // removed unused claimBonus
@@ -574,10 +591,15 @@ export default function Home() {
         offersRefreshedRef.current = true
         void loadTasks()
       }
+      
+      // Hide EARN notifications when user enters EARN section
+      setEarnNotificationVisible(false)
+      setEarnShaking(false)
+      setLastEarnVisitLevel(counters?.level || null)
     } else {
       offersRefreshedRef.current = false
     }
-  }, [activeSection])
+  }, [activeSection, counters?.level])
 
   // Refresh tasks when level changes (gating depends on level)
   const lastLevelRef = useRef<number | null>(null)
@@ -591,6 +613,10 @@ export default function Home() {
     if (currentLevel !== lastLevelRef.current) {
       lastLevelRef.current = currentLevel
       void loadTasks()
+      
+      // Show EARN notifications when leveling up (new tasks available)
+      setEarnNotificationVisible(true)
+      setEarnShaking(true)
     }
   }, [counters?.level])
 
@@ -826,7 +852,12 @@ export default function Home() {
             <div style={{ marginTop: 6 }}>{debugState?.lastLevel?.bonus_multiplier ?? 'n/a'}</div>
           </div> */}
 
-          <BottomNavShadow active={activeSection} onSelect={setActiveSection} />
+          <BottomNavShadow 
+            active={activeSection} 
+            onSelect={setActiveSection}
+            earnNotificationVisible={earnNotificationVisible}
+            earnShaking={earnShaking}
+          />
         </>
       )}
     </main>

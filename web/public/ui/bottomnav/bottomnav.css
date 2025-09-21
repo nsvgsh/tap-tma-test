@@ -141,6 +141,31 @@ html, body {
   }
 }
 
+/* EARN notification shaking animation */
+@keyframes earn-shake {
+  0%, 100% { transform: translateX(0); }
+  10% { transform: translateX(-2px) rotate(-1deg); }
+  20% { transform: translateX(2px) rotate(1deg); }
+  30% { transform: translateX(-2px) rotate(-1deg); }
+  40% { transform: translateX(2px) rotate(1deg); }
+  50% { transform: translateX(-1px) rotate(-0.5deg); }
+  60% { transform: translateX(1px) rotate(0.5deg); }
+  70% { transform: translateX(-1px) rotate(-0.5deg); }
+  80% { transform: translateX(1px) rotate(0.5deg); }
+  90% { transform: translateX(-1px) rotate(-0.5deg); }
+}
+
+.earn-shaking {
+  animation: earn-shake 1.2s ease-in-out infinite;
+}
+
+/* Respect reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .earn-shaking {
+    animation: none;
+  }
+}
+
 
 
 
