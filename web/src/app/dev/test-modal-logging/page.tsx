@@ -1,11 +1,26 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { modalClickLogger } from '@/lib/modalClickLogger';
 
 export default function TestModalLoggingPage() {
   const [result, setResult] = useState<string>('');
   const [loading, setLoading] = useState(false);
+  const [envStatus, setEnvStatus] = useState<any>(null);
+
+  useEffect(() => {
+    checkEnvironment();
+  }, []);
+
+  const checkEnvironment = async () => {
+    try {
+      const response = await fetch('/api/v1/debug/env-check');
+      const data = await response.json();
+      setEnvStatus(data);
+    } catch (error) {
+      setEnvStatus({ error: 'Failed to check environment' });
+    }
+  };
 
   const testLogging = async () => {
     setLoading(true);
@@ -98,10 +113,33 @@ export default function TestModalLoggingPage() {
       
       <div style={{ marginTop: '20px', fontSize: '14px', color: '#666' }}>
         <h3>Environment Check:</h3>
-        <ul>
-          <li>NEXT_PUBLIC_SUPABASE_URL: {process.env.NEXT_PUBLIC_SUPABASE_URL ? '✅ Set' : '❌ Missing'}</li>
-          <li>SUPABASE_SERVICE_ROLE_KEY: {process.env.SUPABASE_SERVICE_ROLE_KEY ? '✅ Set' : '❌ Missing'}</li>
-        </ul>
+        {envStatus ? (
+          <div>
+            <ul>
+              <li>NEXT_PUBLIC_SUPABASE_URL: {envStatus.environment?.supabaseUrl || 'Unknown'}</li>
+              <li>SUPABASE_SERVICE_ROLE_KEY: {envStatus.environment?.serviceKey || 'Unknown'}</li>
+            </ul>
+            <p style={{ color: envStatus.environment?.hasSupabaseUrl && envStatus.environment?.hasServiceKey ? 'green' : 'red' }}>
+              <strong>{envStatus.message}</strong>
+            </p>
+            <button 
+              onClick={checkEnvironment}
+              style={{ 
+                padding: '5px 10px', 
+                fontSize: '12px',
+                backgroundColor: '#007bff',
+                color: 'white',
+                border: 'none',
+                borderRadius: '3px',
+                cursor: 'pointer'
+              }}
+            >
+              Refresh Check
+            </button>
+          </div>
+        ) : (
+          <p>Loading environment check...</p>
+        )}
       </div>
     </div>
   );
