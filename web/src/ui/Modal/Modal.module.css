@@ -1,0 +1,206 @@
+/* Font-face is defined globally in globals.css; avoid duplicate declarations here */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: calc(16px + env(safe-area-inset-top)) 16px calc(24px + env(safe-area-inset-bottom));
+}
+
+.card {
+  inline-size: clamp(0px, 100%, 388px);
+  /* 592px @ 420px width: maintain aspect as width scales down; clamp to viewport */
+  block-size: min(calc(100cqw * 592 / 420), calc(90dvh - (env(safe-area-inset-top) + env(safe-area-inset-bottom))));
+  max-height: min(592px, calc(90dvh - (env(safe-area-inset-top) + env(safe-area-inset-bottom))));
+  overflow: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  padding: 20px 16px 16px;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+  background: radial-gradient(60% 50% at 50% 40%, #074274 0%, #082D53 60%, #082D53 100%);
+  color: var(--theme-foreground);
+  text-align: center;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto; /* header / scrollable rewards / sticky CTAs */
+  row-gap: 12px;
+  container-type: inline-size;
+}
+.headerArea {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+
+.headline {
+  font-family: 'Lilita One', sans-serif;
+  font-size: clamp(14px, 6cqw, 20px);
+  letter-spacing: 0.5px;
+  text-shadow: 0 2px 0 rgba(0,0,0,0.35);
+  opacity: 0.95;
+  color: #ffffff;
+}
+
+.shield {
+  position: relative;
+  width: clamp(85px, 35cqw, 180px);
+  aspect-ratio: 5 / 6;
+  margin: 16px auto 0px auto;
+  background: url('/dev/ui/header/assets/Icon_ImageIcon_LevelFrame1.png') center/contain no-repeat;
+  filter: drop-shadow(0 10px 20px rgba(0,0,0,0.35));
+  container-type: size;
+}
+
+.levelNum {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Lilita One', sans-serif;
+  font-size: min(50cqh, 120px);
+  font-weight: 400;
+  color: #ffffff;
+  transform: translateY(-6%);
+  filter: drop-shadow(0 0.08em 0 #000000);
+  -webkit-text-stroke: 0.03em #000000;
+}
+
+.title {
+  font-family: 'Lilita One';
+  font-size: clamp(18px, 12cqw, 40px);
+  /* margin-top: -7px; */
+  padding-top: 8px;
+  font-weight: 400;
+  /* letter-spacing: -0.025em; */
+  color: #ffffff;  
+  filter: drop-shadow(0 0.08em 0 #000000);
+}
+
+.rewardsBox {
+  container-type: size;   
+  container-name: rewards;
+  overflow-y: auto;
+  min-height: 0;
+  /* margin-top: 12px; */
+  /* margin-bottom: 12px; */
+  padding: 14px 12px 4px 12px;
+  border-radius: 16px;
+  background: rgba(0,0,0,0.25);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+}
+
+.rewardsLabel {
+  font-weight: 700;
+  opacity: 0.9;
+  letter-spacing: 1px;
+  font-size: 13px;
+  text-align: center;
+  display: block;
+  color: #ffffff;
+}
+
+.rewardsRow {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr)); /* always two columns */
+  gap: 12px;
+  justify-items: stretch;
+  align-items: stretch;
+  margin-top: 12px;
+  flex: 1 1 auto;          /* take remaining vertical space in rewardsBox */
+  padding: 8px;             /* internal paddings as requested */
+  min-height: 0;            /* allow shrinking inside flex column parent */
+  overflow: hidden;         /* prevent scroll within rewards bar */
+}
+
+.actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  align-self: end; /* pin to bottom grid row edge */
+}
+
+.actionsItem { 
+  flex: 1 1 0; 
+  max-width: 280px; 
+  container-type: inline-size; /* allow 100cqw-based CTA height calculation */
+}
+
+/* Maintain CTA aspect ratio: height/width = 55/172 ≈ 0.31977 */
+.ctaButton { 
+  width: 100%;
+  height: clamp(0px, 100cqw * 70 / 172, 70px) !important;
+}
+
+
+
+/* Reward button styles adapted from bottomnav, scoped to the modal */
+.rewardBtn {
+  flex: 1 1 0;
+  position: relative;
+  display: block;           /* allow height:100% to take effect in flex row */
+  height: 100%;             /* fill rewardsRow height */
+}
+
+.rewardBtnBg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: fill; /* fill container; ignore intrinsic aspect ratio */
+}
+
+.rewardBtnOverlay {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-rows: 1fr auto; /* icon area + label area */
+  justify-items: center;
+  align-items: center;
+  container-type: size; /* enable cqh for label sizing */
+  padding-bottom: 6cqh;
+}
+
+.rewardBtnIcon {
+  display: block;
+  width: 100%;
+  height: auto;
+  align-self: center;   /* center horizontally in grid cell */
+  justify-self: center; /* center horizontally in grid cell */
+}
+
+/* Reuse font preferences from bottomnav; only font-size will vary via inline style */
+/* .rewardBtnLabel {
+  font-family: 'Lilita One';
+  font-weight: 400;
+  letter-spacing: -0.025em;
+  color: #ffffff;  
+  filter: drop-shadow(0 0.08em 0 #000000);
+  align-self: end;   /* places label in bottom row (auto) */
+  /* justify-self: center;
+  font-size: min(28cqh, 28cqw); /* tie to overlay height */
+  /* -webkit-text-stroke: 0.018em #000000;  */
+/* }  */
+
+/* Action label styles to replace inline label styling */
+.actionLabel {
+  font-family: 'Lilita One';
+  font-weight: 400;
+  letter-spacing: -0.025em;
+  color: #ffffff;
+  -webkit-text-stroke: 0.018em #000000;
+  filter: drop-shadow(0 0.07em 0 #000000);
+  line-height: 1;
+  font-size: clamp(25px, 22cqw, 40px);
+  transform: translateY(calc(-1 * 0.12 * 100%));
+}
+
