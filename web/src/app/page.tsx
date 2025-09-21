@@ -650,6 +650,9 @@ export default function Home() {
                 })()}
                 bonusLabel={'Skip'}
                 singleAction={true}
+                userId={userId || undefined}
+                sessionId={session?.sessionId || undefined}
+                onClose={() => setLeveledUp(null)}
               />
             ) : (
               <LevelUpModal
@@ -664,6 +667,9 @@ export default function Home() {
                 onStartAd={startLevelBonus}
                 claimLabel={'Claim'}
                 bonusLabel={'BONUS'}
+                userId={userId || undefined}
+                sessionId={session?.sessionId || undefined}
+                onClose={() => setLeveledUp(null)}
               />
             )
           )}

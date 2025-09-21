@@ -49,3 +49,4 @@
 | UI-BOTTOMNAV-active_tap_states | Added active indicator and tap feedback to bottom nav |
 | UI-LEVELUP-MODAL-POLISH-001 | Constrained modal to 420px, added 3-row grid (50/30/20), tokenized colors/typography, extracted RewardPill, removed inline styles |
 | ENV-0001 | Added DATABASE_URL to docs/env.example; setup script now includes it for web/.env.local |
+| UI-EARN-WIDE-BUTTON-001 | Added wide button "SIGN UP FOR FREE TRIAL" for first level users in EARN section |
