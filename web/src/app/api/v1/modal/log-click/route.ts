@@ -11,6 +11,12 @@ const supabase = supabaseUrl && supabaseServiceKey
 export async function POST(request: NextRequest) {
   try {
     if (!supabase) {
+      console.error('Missing Supabase environment variables:', {
+        hasUrl: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
+        hasServiceKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
+        url: process.env.NEXT_PUBLIC_SUPABASE_URL ? 'Set' : 'Missing',
+        serviceKey: process.env.SUPABASE_SERVICE_ROLE_KEY ? 'Set' : 'Missing'
+      });
       return NextResponse.json(
         { error: 'Database not configured. Please set SUPABASE environment variables.' },
         { status: 503 }
