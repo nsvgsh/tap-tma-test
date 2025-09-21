@@ -94,4 +94,56 @@
   100% { opacity: 0; transform: translate(-50%, -140%); }
 }
 
+.tapHint {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  width: 100px;
+  height: 100px;
+  z-index: 4;
+  pointer-events: none;
+  animation: pulse 1.5s ease-in-out infinite;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+}
+
+.circularText {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 220px;
+  height: 220px;
+  z-index: 3;
+  pointer-events: none;
+  animation: rotate 8s linear infinite;
+}
+
+.circularText svg {
+  width: 100%;
+  height: 100%;
+}
+
+.circularText text {
+  font-size: 24px;
+  font-weight: bold;
+  fill: white;
+}
+
+@keyframes rotate {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+@keyframes pulse {
+  0% { 
+    transform: scale(1);
+  }
+  50% { 
+    transform: scale(1.2);
+  }
+  100% { 
+    transform: scale(1);
+  }
+}
+
 

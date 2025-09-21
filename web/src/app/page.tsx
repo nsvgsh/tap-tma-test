@@ -652,19 +652,24 @@ export default function Home() {
               </div>
               <AvatarRow />
               <div style={{ marginTop: 8 }}>
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, paddingTop: '10dvh', paddingBottom: 'calc(24px + env(safe-area-inset-bottom))' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, paddingTop: '10dvh' }}>
                   <EmojiClicker
                     size={clickerSize}
                     onTap={() => { void tap() }}
                     haptics={true}
                   />
-                  <div style={{ fontSize: 12, opacity: 0.75 }}>Tap to earn coins</div>
-                  {nextThreshold ? (
-                    <div style={{ fontSize: 11, opacity: 0.6 }}>Next: L{nextThreshold.level} • {nextThreshold.coins} coins</div>
-                  ) : null}
                 </div>
               </div>
             </ScreenContainer>
+          )}
+          
+          {activeSection === 'home' && (
+            <div style={{ position: 'fixed', bottom: '150px', left: '50%', transform: 'translateX(-50%)', textAlign: 'center', zIndex: 10 }}>
+              <div style={{ fontSize: 12, opacity: 0.75, marginBottom: 4 }}>Tap to earn coins</div>
+              {nextThreshold ? (
+                <div style={{ fontSize: 11, opacity: 0.6 }}>Next: L{nextThreshold.level} • {nextThreshold.coins} coins</div>
+              ) : null}
+            </div>
           )}
 
           {activeSection === 'offers' && (

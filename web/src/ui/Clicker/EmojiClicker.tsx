@@ -142,6 +142,9 @@ export function EmojiClicker(props: EmojiClickerProps) {
   const imgRef = useRef<HTMLImageElement | null>(null)
   const spanRef = useRef<HTMLSpanElement | null>(null)
   const [shapeRadius, setShapeRadius] = useState<number>(28)
+  const [hintOpacity, setHintOpacity] = useState<number>(1)
+  const [recentTaps, setRecentTaps] = useState<number>(0)
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   // Heuristic: adjust border radius by visual width ratio of the media (image or emoji fallback)
   useEffect(() => {
@@ -192,6 +195,28 @@ export function EmojiClicker(props: EmojiClickerProps) {
     pushParticle(x, y, currentAsset)
     handleHaptic()
     setTapCount((c) => c + 1)
+    
+    // Handle hint opacity logic
+    setRecentTaps(prev => {
+      const newCount = prev + 1
+      // Gradually decrease opacity with each tap (20% per tap)
+      const newOpacity = Math.max(0, 1 - (newCount * 0.2))
+      setHintOpacity(newOpacity)
+      
+      if (newCount >= 5) {
+        // Clear any existing timeout
+        if (timeoutRef.current) {
+          clearTimeout(timeoutRef.current)
+        }
+        // Set timeout to bring back hints after 3 seconds of no taps
+        timeoutRef.current = setTimeout(() => {
+          setHintOpacity(1)
+          setRecentTaps(0)
+        }, 3000)
+      }
+      return newCount
+    })
+    
     if ((tapCount + 1) % 3 === 0) {
       if (sourceList.length >= 2) {
         // rotate to a different asset
@@ -213,6 +238,15 @@ export function EmojiClicker(props: EmojiClickerProps) {
   const onPointerDown = useCallback(() => setIsPressing(true), [])
   const onPointerUp = useCallback(() => setIsPressing(false), [])
   const onPointerLeave = useCallback(() => setIsPressing(false), [])
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current)
+      }
+    }
+  }, [])
 
   type ClickerStyle = React.CSSProperties & { ['--shape-radius']?: string }
   const rootStyle = useMemo<ClickerStyle>(() => ({
@@ -261,6 +295,28 @@ export function EmojiClicker(props: EmojiClickerProps) {
             </span>
           ))}
         </div>
+      </div>
+      <img 
+        className={styles.tapHint} 
+        src="/ui/emojis/icon_tap.png" 
+        alt="Tap hint" 
+        aria-hidden="true"
+        style={{ opacity: hintOpacity, transition: 'opacity 0.3s ease' }}
+      />
+      <div 
+        className={styles.circularText}
+        style={{ opacity: hintOpacity, transition: 'opacity 0.3s ease' }}
+      >
+        <svg viewBox="0 0 220 220">
+          <defs>
+            <path id="circle" d="M 110, 110 m -90, 0 a 90,90 0 1,1 180,0 a 90,90 0 1,1 -180,0" />
+          </defs>
+          <text>
+            <textPath href="#circle" startOffset="0%">
+              START TAP TO EARN REAL CASH 
+            </textPath>
+          </text>
+        </svg>
       </div>
     </div>
   )
