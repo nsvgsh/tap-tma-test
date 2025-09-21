@@ -1,0 +1,67 @@
+@font-face {
+  font-family: 'Lilita One';
+  src: url('/dev/ui/buttons/assets/LilitaOne-Regular.ttf') format('truetype');
+  font-display: swap;
+}
+
+/*
+  Single-source theme tokens (game palette)
+  Edit these tokens to change global colors app-wide.
+*/
+:root {
+  /* Solid color used by components that need a color (not an image/gradient) */
+  --theme-background: #23558e; /* page background (solid) */
+  /* Page gradient background: bottom (#275c99) → top (#162e54) */
+  --theme-background-gradient: linear-gradient(
+    to top, 
+    #275d99 0%, 
+    #23558e 39%, 
+    #1c4171 74%, 
+    #152d56 100%
+  );
+  --theme-foreground: #ffffff; /* default text color */
+  
+  /* Component tokens */
+  --bottomnav-background: #0E233D;
+  --bottomnav-foreground: var(--theme-foreground);
+  --bottomnav-height: 6dvh;
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+body {
+  color: var(--theme-foreground);
+  background: var(--theme-background-gradient);
+  font-family: Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* OS color scheme hints disabled – the app uses a fixed game palette */
+
+/* Bottom navigation gradient overlay (top→bottom) */
+.bottomNav {
+  position: fixed;
+}
+.bottomNav::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, #000000 0%, #ffffff00 2%);
+  pointer-events: none;
+}
