@@ -9,27 +9,41 @@ export interface LevelModalConfigs {
   [level: number]: LevelModalConfig;
 }
 
-// Configuration for custom level modal layouts
+export const defaultLevelModalConfig: LevelModalConfig = {
+  rewardsLabel: "REWARDS",
+  rewardsLayout: "standard",
+  actionsLayout: "standard",
+};
+
+// JSON конфигурация для кастомных модальных окон
 export const levelModalConfigs: LevelModalConfigs = {
   1: {
     rewardsLabel: "CONGRATS! YOU GOT ACCESS",
     rewardsLayout: "gift-center",
     actionsLayout: "wide-green",
     giftIcon: "/ui/bottomnav/assets/Icon_ImageIcon_Gift_Purple.png"
-  }
-  // Add more levels here as needed
-  // 2: { ... },
-  // 5: { ... },
+  },
+  // Добавьте здесь другие уровни по необходимости
+  5: {
+    rewardsLabel: "CONGRATS! YOU GOT ACCESS",
+    rewardsLayout: "gift-center",
+    actionsLayout: "wide-green",
+    giftIcon: "/ui/bottomnav/assets/Icon_ImageIcon_Gift_Purple.png"
+  },
+  // 10: {
+  //   rewardsLabel: "MILESTONE ACHIEVED!",
+  //   rewardsLayout: "gift-center", 
+  //   actionsLayout: "wide-green",
+  //   giftIcon: "/ui/bottomnav/assets/Icon_ImageIcon_Gift_Purple.png"
+  // }
 };
 
-// Get configuration for a specific level, returns default if not found
-export function getLevelModalConfig(level: number): LevelModalConfig | null {
-  return levelModalConfigs[level] || null;
-}
+// Функция для получения конфигурации уровня
+export const getLevelModalConfig = (level: number): LevelModalConfig | undefined => {
+  return levelModalConfigs[level];
+};
 
-// Default configuration for standard levels
-export const defaultLevelModalConfig: LevelModalConfig = {
-  rewardsLabel: "REWARDS",
-  rewardsLayout: "standard",
-  actionsLayout: "standard"
+// Функция для проверки есть ли кастомная конфигурация для уровня
+export const hasCustomModalConfig = (level: number): boolean => {
+  return level in levelModalConfigs;
 };
