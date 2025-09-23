@@ -17,6 +17,7 @@ function pickIconForTask(id: string): 'chest' | 'target' {
 export type EarnItem = {
   taskId: string
   rewardPayload: Record<string, unknown> | null
+  unlockLevel?: number
   state: 'available' | 'claimed' | string
 }
 
@@ -35,9 +36,9 @@ export function EarnGrid(props: {
 
   const toTiles = (items: EarnItem[] | null): EarnTile[] => {
     if (!Array.isArray(items)) return []
-    return items.map((it, idx) => ({
+    return items.map((it) => ({
       id: it.taskId,
-      badgeNumber: idx + 1,
+      badgeNumber: it.unlockLevel ?? 1, // Use unlockLevel from database instead of index
       icon: pickIconForTask(it.taskId),
       ctaLabel: 'Open',
     }))

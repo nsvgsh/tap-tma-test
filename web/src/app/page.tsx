@@ -68,7 +68,7 @@ export default function Home() {
   const [leveledUp, setLeveledUp] = useState<number | null>(null)
   const [nextThreshold, setNextThreshold] = useState<NextThreshold>(null)
   const [debugState, setDebugState] = useState<DebugState>(null)
-  type TaskDef = { taskId: string; state: 'available' | 'claimed'; rewardPayload?: Record<string, unknown> }
+  type TaskDef = { taskId: string; state: 'available' | 'claimed'; rewardPayload?: Record<string, unknown>; unlockLevel?: number }
   const [tasks, setTasks] = useState<TaskDef[] | null>(null)
   const [tasksLoading, setTasksLoading] = useState<boolean>(false)
   const tasksLoadInFlightRef = useRef<boolean>(false)
@@ -353,7 +353,7 @@ export default function Home() {
     try {
       const res = await fetch('/api/v1/tasks')
       if (!res.ok) return
-      const data = await res.json() as { definitions?: TaskDef[] }
+      const data = await res.json() as { definitions?: Array<TaskDef & { unlockLevel?: number }> }
       setTasks(data.definitions || [])
       // hydrate unlocks relevant to current tasks
       try {
@@ -697,12 +697,12 @@ export default function Home() {
                   available={Array.isArray(tasks)
                     ? tasks
                         .filter((t) => t.state === 'available')
-                        .map((t) => ({ taskId: t.taskId, rewardPayload: t.rewardPayload ?? null, state: t.state }))
+                        .map((t) => ({ taskId: t.taskId, rewardPayload: t.rewardPayload ?? null, state: t.state, unlockLevel: t.unlockLevel ?? 1 }))
                     : []}
                   completed={Array.isArray(tasks)
                     ? tasks
                         .filter((t) => t.state === 'claimed')
-                        .map((t) => ({ taskId: t.taskId, rewardPayload: t.rewardPayload ?? null, state: t.state }))
+                        .map((t) => ({ taskId: t.taskId, rewardPayload: t.rewardPayload ?? null, state: t.state, unlockLevel: t.unlockLevel ?? 1 }))
                     : []}
                   activeTab={offersTab}
                   onTabChange={setOffersTab}
