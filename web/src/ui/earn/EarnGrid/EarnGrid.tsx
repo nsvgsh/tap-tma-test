@@ -18,7 +18,8 @@ export type EarnItem = {
   taskId: string
   rewardPayload: Record<string, unknown> | null
   unlockLevel?: number
-  state: 'available' | 'claimed' | string
+  wide?: boolean
+  state: 'available' | 'claimed' | 'hidden' | string
 }
 
 export function EarnGrid(props: {
@@ -36,19 +37,25 @@ export function EarnGrid(props: {
 
   const toTiles = (items: EarnItem[] | null): EarnTile[] => {
     if (!Array.isArray(items)) return []
-    return items.map((it) => ({
-      id: it.taskId,
-      badgeNumber: it.unlockLevel ?? 1, // Use unlockLevel from database instead of index
-      icon: pickIconForTask(it.taskId),
-      ctaLabel: 'Open',
-    }))
+    return items
+      .filter((it) => it.state !== 'hidden') // Фильтруем скрытые задачи
+      .map((it) => ({
+        id: it.taskId,
+        badgeNumber: it.unlockLevel ?? 1, // Use unlockLevel from database instead of index
+        icon: pickIconForTask(it.taskId),
+        ctaLabel: 'Open',
+      }))
   }
 
   const list = activeTab === 'available' ? toTiles(available) : toTiles(completed)
   
-  // Show wide button only on first level and available tab
-  // The wide button should appear when user is exactly level 1
-  const showWideButton = userLevel === 1 && activeTab === 'available'
+  // Find wide tasks that should be displayed
+  const wideTasks = activeTab === 'available' 
+    ? (available || []).filter((it) => it.wide && it.state === 'available')
+    : (completed || []).filter((it) => it.wide && it.state === 'claimed')
+  
+  // Show wide button only on first level and available tab (legacy logic)
+  const showWideButton = userLevel === 1 && activeTab === 'available' && wideTasks.length === 0
   
   // Debug logging
   if (typeof window !== 'undefined') {
@@ -83,6 +90,7 @@ export function EarnGrid(props: {
         <EmptyState label={activeTab === 'available' ? 'No available offers' : 'No completed offers'} />
       ) : (
         <div className={styles.grid}>
+          {/* Legacy wide button (fallback) */}
           {showWideButton && (
             <WideEarnTile
               id="wide-trial-button"
@@ -96,6 +104,24 @@ export function EarnGrid(props: {
               }}
             />
           )}
+          
+          {/* Wide tasks from database */}
+          {wideTasks.map((task) => (
+            <WideEarnTile
+              key={task.taskId}
+              id={task.taskId}
+              badgeNumber={task.unlockLevel ?? 1}
+              icon="chest"
+              ctaLabel="SIGN UP FOR FREE TRIAL"
+              onClick={(id) => {
+                if (activeTab === 'available') {
+                  onWatch?.(id)
+                }
+              }}
+            />
+          ))}
+          
+          {/* Regular tasks */}
           {list.map((t) => {
             const left = secondsLeft?.(t.id)
             const disabled = typeof left === 'number' && left <= 0

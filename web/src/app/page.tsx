@@ -68,7 +68,7 @@ export default function Home() {
   const [leveledUp, setLeveledUp] = useState<number | null>(null)
   const [nextThreshold, setNextThreshold] = useState<NextThreshold>(null)
   const [debugState, setDebugState] = useState<DebugState>(null)
-  type TaskDef = { taskId: string; state: 'available' | 'claimed'; rewardPayload?: Record<string, unknown>; unlockLevel?: number }
+  type TaskDef = { taskId: string; state: 'available' | 'claimed' | 'hidden'; rewardPayload?: Record<string, unknown>; unlockLevel?: number; wide?: boolean }
   const [tasks, setTasks] = useState<TaskDef[] | null>(null)
   const [tasksLoading, setTasksLoading] = useState<boolean>(false)
   const tasksLoadInFlightRef = useRef<boolean>(false)
@@ -697,12 +697,12 @@ export default function Home() {
                   available={Array.isArray(tasks)
                     ? tasks
                         .filter((t) => t.state === 'available')
-                        .map((t) => ({ taskId: t.taskId, rewardPayload: t.rewardPayload ?? null, state: t.state, unlockLevel: t.unlockLevel ?? 1 }))
+                        .map((t) => ({ taskId: t.taskId, rewardPayload: t.rewardPayload ?? null, state: t.state, unlockLevel: t.unlockLevel ?? 1, wide: t.wide ?? false }))
                     : []}
                   completed={Array.isArray(tasks)
                     ? tasks
                         .filter((t) => t.state === 'claimed')
-                        .map((t) => ({ taskId: t.taskId, rewardPayload: t.rewardPayload ?? null, state: t.state, unlockLevel: t.unlockLevel ?? 1 }))
+                        .map((t) => ({ taskId: t.taskId, rewardPayload: t.rewardPayload ?? null, state: t.state, unlockLevel: t.unlockLevel ?? 1, wide: t.wide ?? false }))
                     : []}
                   activeTab={offersTab}
                   onTabChange={setOffersTab}

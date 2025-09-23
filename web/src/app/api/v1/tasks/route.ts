@@ -10,7 +10,7 @@ export async function GET() {
 
   const data = await withClient(async (c) => {
     const defs = await c.query(
-      'select task_id as "taskId", unlock_level as "unlockLevel", kind, reward_payload as "rewardPayload", verification from task_definitions where active=true order by unlock_level'
+      'select task_id as "taskId", unlock_level as "unlockLevel", kind, reward_payload as "rewardPayload", verification, wide from task_definitions where active=true order by unlock_level'
     )
     const prog = await c.query(
       'select task_id as "taskId", state, claimed_at as "claimedAt" from task_progress where user_id=$1',
@@ -18,6 +18,13 @@ export async function GET() {
     )
     const lvl = await c.query('select level from user_counters where user_id=$1', [userId])
     const userLevel = Number(lvl.rows[0]?.level || 0)
+
+    // Проверяем, есть ли у пользователя клики по try_for_free в modal_clicks
+    const tryForFreeClicks = await c.query(
+      'select count(*) as count from modal_clicks where user_id=$1 and click_type=$2',
+      [userId, 'try_for_free']
+    )
+    const hasTryForFreeClick = Number(tryForFreeClicks.rows[0]?.count || 0) > 0
 
     // Проверяем Monetag события для task_claim (только closed события)
     const monetagClosedEvents = await c.query(
@@ -43,7 +50,7 @@ export async function GET() {
       progressByTaskId.set(p.taskId, p)
     }
 
-    const definitions = (defs.rows as { taskId: string; unlockLevel: number; kind: string; rewardPayload: unknown; verification: string }[]).map(
+    const definitions = (defs.rows as { taskId: string; unlockLevel: number; kind: string; rewardPayload: unknown; verification: string; wide: boolean }[]).map(
       (d) => {
         const p = progressByTaskId.get(d.taskId)
         
@@ -55,6 +62,16 @@ export async function GET() {
         // Если есть Monetag closed событие для этой конкретной задачи, помечаем как claimed
         if (monetagCompletedTasks.has(d.taskId) && d.verification === 'none') {
           return { ...d, state: 'claimed' }
+        }
+        
+        // Специальная логика для широких задач (wide = true)
+        if (d.wide) {
+          // Если у пользователя есть клики try_for_free, скрываем широкую задачу
+          if (hasTryForFreeClick) {
+            return { ...d, state: 'hidden' }
+          }
+          // Иначе показываем как available
+          return { ...d, state: 'available' }
         }
         
         // Иначе используем стандартную логику разблокировки по уровню
