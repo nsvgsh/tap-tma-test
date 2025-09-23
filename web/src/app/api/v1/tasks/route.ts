@@ -19,6 +19,12 @@ export async function GET() {
     const lvl = await c.query('select level from user_counters where user_id=$1', [userId])
     const userLevel = Number(lvl.rows[0]?.level || 0)
 
+    // Проверяем Monetag события для task_claim (только closed события)
+    const monetagClosedEvents = await c.query(
+      'select id from ad_events where user_id=$1 and provider=$2 and placement=$3 and status=$4',
+      [userId, 'monetag', 'task_claim', 'closed']
+    )
+
     const progressByTaskId = new Map<string, { taskId: string; state: string; claimedAt: string | null }>()
     for (const p of prog.rows as { taskId: string; state: string; claimedAt: string | null }[]) {
       progressByTaskId.set(p.taskId, p)
@@ -27,7 +33,19 @@ export async function GET() {
     const definitions = (defs.rows as { taskId: string; unlockLevel: number; kind: string; rewardPayload: unknown; verification: string }[]).map(
       (d) => {
         const p = progressByTaskId.get(d.taskId)
-        const state = p?.state === 'claimed' ? 'claimed' : d.unlockLevel <= userLevel ? 'available' : 'locked'
+        
+        // Если задача уже помечена как claimed в task_progress, используем это состояние
+        if (p?.state === 'claimed') {
+          return { ...d, state: 'claimed' }
+        }
+        
+        // Если есть Monetag closed события для task_claim, помечаем задачу как claimed
+        if (monetagClosedEvents.rows.length > 0 && d.verification === 'none') {
+          return { ...d, state: 'claimed' }
+        }
+        
+        // Иначе используем стандартную логику разблокировки по уровню
+        const state = d.unlockLevel <= userLevel ? 'available' : 'locked'
         return { ...d, state }
       }
     )

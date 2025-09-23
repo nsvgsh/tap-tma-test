@@ -56,3 +56,10 @@
 | UI-EARN-NOTIFICATIONS-4 | Stop shaking after 5 taps or when user enters EARN section |
 | UI-EARN-NOTIFICATIONS-5 | Remove red dot only when user enters EARN section |
 | MODAL-LINK-0001 | Added external link redirect for BONUS button in level-up modal with unique CLICKID generation and modal_clicks logging |
+| MONETAG-TASK-INTEGRATION-001 | Created API endpoint for Monetag postback events processing |
+| MONETAG-TASK-INTEGRATION-002 | Modified tasks API to check Monetag events and mark tasks as completed |
+| MONETAG-TASK-INTEGRATION-003 | Updated frontend to refresh tasks after successful ad viewing |
+| MONETAG-TASK-INTEGRATION-004 | Added database indexes for optimized Monetag events queries |
+| MONETAG-TASK-LOGIC-001 | Modified postback endpoint to handle closed/failed events separately |
+| MONETAG-TASK-LOGIC-002 | Updated tasks API to check only closed Monetag events |
+| MONETAG-TASK-LOGIC-003 | Added periodic task refresh in EARN section for postback tracking |

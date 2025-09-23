@@ -384,6 +384,17 @@ export default function Home() {
     }
   }, [readUnlockForTask])
 
+  // Периодическое обновление задач в EARN секции для отслеживания postback событий
+  useEffect(() => {
+    if (activeSection !== 'offers') return
+    
+    const interval = setInterval(() => {
+      loadTasks()
+    }, 5000) // Обновляем каждые 5 секунд когда пользователь в EARN секции
+    
+    return () => clearInterval(interval)
+  }, [activeSection, loadTasks])
+
   // Watch ad for a specific task (intent-coupled)
   async function watchAdForTask(taskId: string) {
     const impressionId = crypto.randomUUID()
@@ -394,13 +405,20 @@ export default function Home() {
         await loadMonetagSdk({ sdkUrl: monetagSdkUrl, zoneId: monetagZoneId })
       }
       const result = await showRewardedInterstitial(monetagZoneId, { ymid, requestVar: 'task_claim' })
+      
+      // Логируем событие в ad_events (локальное событие)
       const res = await fetch('/api/v1/ad/log', {
         method: 'POST', headers: { 'content-type': 'application/json' },
         body: JSON.stringify({ provider: 'monetag', placement: 'task_claim', status: 'closed', intent: `task:${taskId}`, impressionId, result }),
       })
       if (!res.ok) return
+      
       const ttl = Number.isFinite(adTTLSeconds) ? adTTLSeconds : 180
       setUnlockForTask(taskId, impressionId, ttl)
+      
+      // Обновляем список задач после успешного просмотра рекламы
+      // (postback от Monetag обновит task_progress отдельно)
+      await loadTasks()
     } catch (e) {
       const reason = categorizeMonetagError(e)
       try { showNotice('No ad available. Try again later.') } catch {}
