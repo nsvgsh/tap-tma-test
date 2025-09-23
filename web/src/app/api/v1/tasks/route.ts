@@ -50,27 +50,40 @@ export async function GET() {
       progressByTaskId.set(p.taskId, p)
     }
 
-    const definitions = (defs.rows as { taskId: string; unlockLevel: number; kind: string; rewardPayload: unknown; verification: string; wide: boolean }[])
-      .filter(d => !d.wide) // Исключаем широкие задачи из обычного списка
-      .map((d) => {
-        const p = progressByTaskId.get(d.taskId)
-        
-        // Если задача уже помечена как claimed в task_progress, используем это состояние
-        if (p?.state === 'claimed') {
-          return { ...d, state: 'claimed' }
+    // Обрабатываем все задачи
+    const allTasks = (defs.rows as { taskId: string; unlockLevel: number; kind: string; rewardPayload: unknown; verification: string; wide: boolean }[]).map((d) => {
+      const p = progressByTaskId.get(d.taskId)
+      
+      // Если задача уже помечена как claimed в task_progress, используем это состояние
+      if (p?.state === 'claimed') {
+        return { ...d, state: 'claimed' }
+      }
+      
+      // Если есть Monetag closed событие для этой конкретной задачи, помечаем как claimed
+      if (monetagCompletedTasks.has(d.taskId) && d.verification === 'none') {
+        return { ...d, state: 'claimed' }
+      }
+      
+      // Специальная логика для широких задач (wide = true)
+      if (d.wide) {
+        // Если у пользователя есть клики try_for_free, скрываем широкую задачу
+        if (hasTryForFreeClick) {
+          return { ...d, state: 'hidden' }
         }
-        
-        // Если есть Monetag closed событие для этой конкретной задачи, помечаем как claimed
-        if (monetagCompletedTasks.has(d.taskId) && d.verification === 'none') {
-          return { ...d, state: 'claimed' }
-        }
-        
-        // Используем стандартную логику разблокировки по уровню для обычных задач
-        const state = d.unlockLevel <= userLevel ? 'available' : 'locked'
-        return { ...d, state }
-      })
+        // Иначе показываем как available
+        return { ...d, state: 'available' }
+      }
+      
+      // Иначе используем стандартную логику разблокировки по уровню
+      const state = d.unlockLevel <= userLevel ? 'available' : 'locked'
+      return { ...d, state }
+    })
 
-    return { definitions, progress: prog.rows, userLevel }
+    // Разделяем на обычные и широкие задачи
+    const definitions = allTasks.filter(d => !d.wide)
+    const wideTasks = allTasks.filter(d => d.wide)
+
+    return { definitions, wideTasks, progress: prog.rows, userLevel }
   })
 
   return NextResponse.json(data)

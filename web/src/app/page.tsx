@@ -70,6 +70,7 @@ export default function Home() {
   const [debugState, setDebugState] = useState<DebugState>(null)
   type TaskDef = { taskId: string; state: 'available' | 'claimed' | 'hidden'; rewardPayload?: Record<string, unknown>; unlockLevel?: number; wide?: boolean }
   const [tasks, setTasks] = useState<TaskDef[] | null>(null)
+  const [wideTasks, setWideTasks] = useState<TaskDef[] | null>(null)
   const [tasksLoading, setTasksLoading] = useState<boolean>(false)
   const tasksLoadInFlightRef = useRef<boolean>(false)
   // remove unused leaderboard state to satisfy no-unused-vars
@@ -395,8 +396,9 @@ export default function Home() {
     try {
       const res = await fetch('/api/v1/tasks')
       if (!res.ok) return
-      const data = await res.json() as { definitions?: Array<TaskDef & { unlockLevel?: number }> }
+      const data = await res.json() as { definitions?: Array<TaskDef & { unlockLevel?: number }>; wideTasks?: Array<TaskDef & { unlockLevel?: number }> }
       setTasks(data.definitions || [])
+      setWideTasks(data.wideTasks || [])
       // hydrate unlocks relevant to current tasks
       try {
         const list = (data.definitions || []) as { taskId: string }[]
@@ -747,6 +749,9 @@ export default function Home() {
                     ? tasks
                         .filter((t) => t.state === 'claimed')
                         .map((t) => ({ taskId: t.taskId, rewardPayload: t.rewardPayload ?? null, state: t.state, unlockLevel: t.unlockLevel ?? 1, wide: t.wide ?? false }))
+                    : []}
+                  wideTasks={Array.isArray(wideTasks)
+                    ? wideTasks.map((t) => ({ taskId: t.taskId, rewardPayload: t.rewardPayload ?? null, state: t.state, unlockLevel: t.unlockLevel ?? 1, wide: t.wide ?? false }))
                     : []}
                   activeTab={offersTab}
                   onTabChange={setOffersTab}

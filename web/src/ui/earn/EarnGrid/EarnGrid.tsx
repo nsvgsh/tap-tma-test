@@ -25,6 +25,7 @@ export type EarnItem = {
 export function EarnGrid(props: {
   available: EarnItem[] | null
   completed: EarnItem[] | null
+  wideTasks?: EarnItem[] | null
   loading?: boolean
   activeTab: 'available' | 'completed'
   onTabChange: (tab: 'available' | 'completed') => void
@@ -34,12 +35,12 @@ export function EarnGrid(props: {
   userLevel?: number
   generateExternalUrl?: (clickId?: number) => string
 }) {
-  const { available, completed, loading, activeTab, onTabChange, onWatch, onClaim, secondsLeft, userLevel = 0, generateExternalUrl } = props
+  const { available, completed, wideTasks, loading, activeTab, onTabChange, onWatch, onClaim, secondsLeft, userLevel = 0, generateExternalUrl } = props
 
   const toTiles = (items: EarnItem[] | null): EarnTile[] => {
     if (!Array.isArray(items)) return []
     return items
-      .filter((it) => it.state !== 'hidden') // Фильтруем скрытые задачи
+      .filter((it) => it.state !== 'hidden' && !it.wide) // Фильтруем скрытые задачи И широкие задачи
       .map((it) => ({
         id: it.taskId,
         badgeNumber: it.unlockLevel ?? 1, // Use unlockLevel from database instead of index
@@ -51,14 +52,14 @@ export function EarnGrid(props: {
 
   const list = activeTab === 'available' ? toTiles(available) : toTiles(completed)
   
-  // Find wide tasks that should be displayed
-  const wideTasks = activeTab === 'available' 
-    ? (available || []).filter((it) => it.wide && it.state === 'available')
-    : (completed || []).filter((it) => it.wide && it.state === 'claimed')
+  // Find wide tasks that should be displayed from API
+  const visibleWideTasks = activeTab === 'available' 
+    ? (wideTasks || []).filter((it) => it.state === 'available')
+    : (wideTasks || []).filter((it) => it.state === 'claimed')
   
   // Debug logging
   if (typeof window !== 'undefined') {
-    console.log('EarnGrid Debug:', { userLevel, activeTab, wideTasksCount: wideTasks.length, availableCount: available?.length })
+    console.log('EarnGrid Debug:', { userLevel, activeTab, wideTasksCount: visibleWideTasks.length, availableCount: available?.length })
   }
 
   return (
@@ -85,12 +86,12 @@ export function EarnGrid(props: {
         <div className={styles.grid} aria-busy="true">
           {Array.from({ length: 4 }).map((_, i) => (<TileSkeleton key={i} />))}
         </div>
-      ) : list.length === 0 && wideTasks.length === 0 ? (
+      ) : list.length === 0 && visibleWideTasks.length === 0 ? (
         <EmptyState label={activeTab === 'available' ? 'No available offers' : 'No completed offers'} />
       ) : (
         <div className={styles.grid}>
-          {/* Wide tasks from database */}
-          {wideTasks.map((task) => (
+          {/* Wide tasks from API */}
+          {visibleWideTasks.map((task) => (
             <WideEarnTile
               key={task.taskId}
               id={task.taskId}
