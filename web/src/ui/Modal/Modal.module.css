@@ -182,12 +182,9 @@
   transform: translateY(calc(-1 * 0.12 * 100%));
 }
 
-/* Ensure consistent scaling for custom modal buttons */
+/* Ensure consistent scaling for custom modal buttons - inherit all styles from .ctaButton */
 .giftCenter .ctaButton {
-  width: 100%;
-  height: clamp(0px, 100cqw * 70 / 172, 70px) !important;
-  font-size: clamp(20px, 22cqw, 25px);
-  /* Remove duplicate styles - inherit from .ctaButton */
+  /* All styles inherited from .ctaButton - no overrides needed */
 }
 
 /* Mobile responsiveness for 320px width */
@@ -217,6 +214,11 @@
   .arcText {
     font-size: clamp(14px, 4cqw, 20px); /* Responsive scaling for mobile */
   }
+  
+  .arcTextTop,
+  .arcTextBottom {
+    height: 30px; /* Smaller height for mobile */
+  }
 }
 
 
@@ -244,25 +246,33 @@
 
 /* Split rewards label for custom levels - removed, now using individual positioning */
 
-/* SVG дугообразный текст */
+/* Circular text styling like EmojiClicker but without rotation */
 .arcTextTop {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 3;
+  pointer-events: none;
   width: 100%;
   height: 40px;
   margin-bottom: -10px; /* Отрицательный отступ для приближения к картинке */
   filter: drop-shadow(0 2px 4px rgba(255, 215, 0, 0.3));
   overflow: visible;
-  position: relative;
-  z-index: 3;
 }
 
 .arcTextBottom {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 3;
+  pointer-events: none;
   width: 100%;
   height: 40px;
   margin-top: -10px; /* Отрицательный отступ для приближения к картинке */
   filter: drop-shadow(0 2px 4px rgba(255, 215, 0, 0.3));
   overflow: visible;
-  position: relative;
-  z-index: 3;
 }
 
 .arcText {
@@ -271,6 +281,7 @@
   font-size: clamp(16px, 5cqw, 28px); /* Responsive scaling like Button */
   letter-spacing: 1px;
   text-shadow: 0 2px 4px rgba(255, 215, 0, 0.3);
+  fill: white;
 }
 
 /* Старые стили для fallback (если SVG не поддерживается) */
