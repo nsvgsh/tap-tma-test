@@ -54,12 +54,9 @@ export function EarnGrid(props: {
     ? (available || []).filter((it) => it.wide && it.state === 'available')
     : (completed || []).filter((it) => it.wide && it.state === 'claimed')
   
-  // Show wide button only on first level and available tab (legacy logic)
-  const showWideButton = userLevel === 1 && activeTab === 'available' && wideTasks.length === 0
-  
   // Debug logging
   if (typeof window !== 'undefined') {
-    console.log('EarnGrid Debug:', { userLevel, activeTab, showWideButton, availableCount: available?.length })
+    console.log('EarnGrid Debug:', { userLevel, activeTab, wideTasksCount: wideTasks.length, availableCount: available?.length })
   }
 
   return (
@@ -86,25 +83,10 @@ export function EarnGrid(props: {
         <div className={styles.grid} aria-busy="true">
           {Array.from({ length: 4 }).map((_, i) => (<TileSkeleton key={i} />))}
         </div>
-      ) : list.length === 0 ? (
+      ) : list.length === 0 && wideTasks.length === 0 ? (
         <EmptyState label={activeTab === 'available' ? 'No available offers' : 'No completed offers'} />
       ) : (
         <div className={styles.grid}>
-          {/* Legacy wide button (fallback) */}
-          {showWideButton && (
-            <WideEarnTile
-              id="wide-trial-button"
-              badgeNumber={0}
-              icon="chest"
-              ctaLabel="SIGN UP FOR FREE TRIAL"
-              onClick={(id) => {
-                // Handle wide button click - could open a modal or navigate
-                console.log('Wide button clicked:', id)
-                // For now, just log - you can add specific logic here
-              }}
-            />
-          )}
-          
           {/* Wide tasks from database */}
           {wideTasks.map((task) => (
             <WideEarnTile
