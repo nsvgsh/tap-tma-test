@@ -98,7 +98,7 @@ export default function Home() {
   const [earnNotificationVisible, setEarnNotificationVisible] = useState<boolean>(false)
   const [earnShaking, setEarnShaking] = useState<boolean>(false)
   const [tapCount, setTapCount] = useState<number>(0)
-  // Removed unused variable: lastEarnVisitLevel
+  const [lastEarnVisitLevel, setLastEarnVisitLevel] = useState<number | null>(null)
 
   async function devLogin() {
     const token = process.env.NEXT_PUBLIC_DEV_TOKEN || process.env.DEV_TOKEN || ''
