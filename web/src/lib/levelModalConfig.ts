@@ -3,6 +3,11 @@ export interface LevelModalConfig {
   rewardsLayout: 'standard' | 'gift-center';
   actionsLayout: 'standard' | 'wide-green';
   giftIcon?: string;
+  zeroRewards?: boolean;
+  zeroRewardsPayload?: {
+    coins: number;
+    tickets: number;
+  };
 }
 
 export interface LevelModalConfigs {
@@ -35,8 +40,13 @@ export const getLevelModalConfig = async (level: number): Promise<LevelModalConf
 
     if (data.success && data.hasCustomConfig) {
       console.log(`Using custom config for level ${level}:`, data.config);
-      configCache.set(level, data.config);
-      return data.config;
+      const configWithZeroRewards = {
+        ...data.config,
+        zeroRewards: data.zeroRewards || false,
+        zeroRewardsPayload: data.zeroRewardsPayload || { coins: 0, tickets: 0 }
+      };
+      configCache.set(level, configWithZeroRewards);
+      return configWithZeroRewards;
     } else {
       console.log(`No custom config for level ${level}, using default`);
       configCache.set(level, null);

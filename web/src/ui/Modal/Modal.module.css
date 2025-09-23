@@ -412,3 +412,15 @@
   transform: translateY(calc(-1 * 0.12 * 100%));
 }
 
+/* Zero rewards message */
+.zeroRewardsMessage {
+  font-family: 'Lilita One';
+  font-weight: 400;
+  font-size: clamp(16px, 8cqw, 24px);
+  color: #FFD700;
+  text-align: center;
+  margin-top: 10px;
+  -webkit-text-stroke: 0.02em #000000;
+  filter: drop-shadow(0 0.05em 0 #000000);
+}
+

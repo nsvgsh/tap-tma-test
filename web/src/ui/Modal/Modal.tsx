@@ -145,13 +145,21 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({
     }
     
     // Standard layout
+    // If zeroRewards is true, use zero rewards instead of the passed rewards
+    const displayRewards = config.zeroRewards ? config.zeroRewardsPayload : rewards;
+    
     return (
       <div className={styles.rewardsRow}>
-        {typeof rewards.coins === "number" && (
-          <RewardPill iconSrc="/ui/header/ResourceBar_Icon_Gold.png" label={rewards.coins.toLocaleString()} variant="blue" />
+        {typeof displayRewards?.coins === "number" && displayRewards.coins > 0 && (
+          <RewardPill iconSrc="/ui/header/ResourceBar_Icon_Gold.png" label={displayRewards.coins.toLocaleString()} variant="blue" />
         )}
-        {typeof rewards.tickets === "number" && (
-          <RewardPill iconSrc="/ui/header/Whisk_Purple_Ticket.png" label={rewards.tickets} variant="blue" iconWidthPercent={70} />
+        {typeof displayRewards?.tickets === "number" && displayRewards.tickets > 0 && (
+          <RewardPill iconSrc="/ui/header/Whisk_Purple_Ticket.png" label={displayRewards.tickets} variant="blue" iconWidthPercent={70} />
+        )}
+        {config.zeroRewards && (
+          <div className={styles.zeroRewardsMessage}>
+            Special milestone achieved!
+          </div>
         )}
       </div>
     );

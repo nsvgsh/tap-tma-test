@@ -144,7 +144,13 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({
         success: true,
         hasCustomConfig: true,
-        config: customConfig
+        config: customConfig,
+        // Important: if integration is true, rewards should be zero
+        zeroRewards: true,
+        zeroRewardsPayload: {
+          coins: 0,
+          tickets: 0
+        }
       });
     }
 
