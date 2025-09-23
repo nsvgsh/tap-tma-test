@@ -215,9 +215,12 @@
     font-size: clamp(14px, 4cqw, 20px); /* Responsive scaling for mobile */
   }
   
-  .arcTextTop,
+  .arcTextTop {
+    top: 15%; /* Closer to icon on mobile */
+  }
+  
   .arcTextBottom {
-    height: 30px; /* Smaller height for mobile */
+    bottom: 15%; /* Closer to icon on mobile */
   }
 }
 
@@ -249,30 +252,22 @@
 /* Circular text styling like EmojiClicker but without rotation */
 .arcTextTop {
   position: absolute;
-  top: 50%;
+  top: 20%;
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 3;
   pointer-events: none;
-  width: 100%;
-  height: 40px;
-  margin-bottom: -10px; /* Отрицательный отступ для приближения к картинке */
-  filter: drop-shadow(0 2px 4px rgba(255, 215, 0, 0.3));
-  overflow: visible;
+  text-align: center;
 }
 
 .arcTextBottom {
   position: absolute;
-  top: 50%;
+  bottom: 20%;
   left: 50%;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, 50%);
   z-index: 3;
   pointer-events: none;
-  width: 100%;
-  height: 40px;
-  margin-top: -10px; /* Отрицательный отступ для приближения к картинке */
-  filter: drop-shadow(0 2px 4px rgba(255, 215, 0, 0.3));
-  overflow: visible;
+  text-align: center;
 }
 
 .arcText {
@@ -280,8 +275,9 @@
   font-weight: 700;
   font-size: clamp(16px, 5cqw, 28px); /* Responsive scaling like Button */
   letter-spacing: 1px;
+  color: #FFD700;
   text-shadow: 0 2px 4px rgba(255, 215, 0, 0.3);
-  fill: white;
+  filter: drop-shadow(0 2px 4px rgba(255, 215, 0, 0.3));
 }
 
 /* Старые стили для fallback (если SVG не поддерживается) */

@@ -115,22 +115,10 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({
     if (config.rewardsLayout === 'gift-center') {
       return (
         <div className={styles.giftCenter}>
-          {/* SVG для дугообразного текста сверху */}
-          <svg className={styles.arcTextTop} viewBox="0 0 200 40" width="200" height="40">
-            <defs>
-              <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="#FFD700" />
-                <stop offset="50%" stopColor="#FFA500" />
-                <stop offset="100%" stopColor="#FF8C00" />
-              </linearGradient>
-            </defs>
-            <path id="arcPathTop" d="M 20 30 Q 100 10 180 30" fill="none" stroke="none" />
-            <text className={styles.arcText}>
-              <textPath href="#arcPathTop" startOffset="50%" textAnchor="middle" fill="url(#goldGradient)">
-                CONGRATS!
-              </textPath>
-            </text>
-          </svg>
+          {/* Обычный текст сверху */}
+          <div className={styles.arcTextTop}>
+            <span className={styles.arcText}>CONGRATS!</span>
+          </div>
           
           <img 
             src={config.giftIcon} 
@@ -138,22 +126,10 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({
             className={styles.giftIcon}
           />
           
-          {/* SVG для дугообразного текста снизу */}
-          <svg className={styles.arcTextBottom} viewBox="0 0 200 40" width="200" height="40">
-            <defs>
-              <linearGradient id="goldGradientBottom" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="#FFD700" />
-                <stop offset="50%" stopColor="#FFA500" />
-                <stop offset="100%" stopColor="#FF8C00" />
-              </linearGradient>
-            </defs>
-            <path id="arcPathBottom" d="M 20 10 Q 100 30 180 10" fill="none" stroke="none" />
-            <text className={styles.arcText}>
-              <textPath href="#arcPathBottom" startOffset="50%" textAnchor="middle" fill="url(#goldGradientBottom)">
-                YOU GOT ACCESS
-              </textPath>
-            </text>
-          </svg>
+          {/* Обычный текст снизу */}
+          <div className={styles.arcTextBottom}>
+            <span className={styles.arcText}>YOU GOT ACCESS</span>
+          </div>
           
           {/* Кнопка внутри rewardsBox для кастомных уровней */}
           <Button variant="confirm" className={styles.ctaButton} width="100%" onClick={handleTryForFreeClick}>
