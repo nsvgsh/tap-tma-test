@@ -56,7 +56,7 @@ export async function GET(request: NextRequest) {
     console.log(`Querying level_reward_templates for level ${levelNum}...`);
     const { data: templates, error: templateError } = await supabase
       .from('level_reward_templates')
-      .select('integration, level, active, template_id, created_at')
+      .select('integration, level, active, template_id, updated_at')
       .eq('level', levelNum)
       .eq('active', true)
       .order('updated_at', { ascending: false })
@@ -85,7 +85,7 @@ export async function GET(request: NextRequest) {
         integration: t.integration, 
         active: t.active,
         template_id: t.template_id,
-        created_at: t.created_at 
+        updated_at: t.updated_at 
       }))
     });
 
@@ -95,7 +95,7 @@ export async function GET(request: NextRequest) {
       
       const { data: allTemplates, error: allTemplatesError } = await supabase
         .from('level_reward_templates')
-        .select('integration, level, active, template_id, created_at')
+        .select('integration, level, active, template_id, updated_at')
         .eq('level', levelNum)
         .order('updated_at', { ascending: false })
         .limit(10);
