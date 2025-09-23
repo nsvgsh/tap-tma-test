@@ -229,34 +229,12 @@ export default function Home() {
   // removed unused claimBonus
 
   // Start level bonus flow: redirect to external link with unique CLICKID
-  async function startLevelBonus() {
-    // Generate unique CLICKID using Unix timestamp
-    const clickId = Math.floor(Date.now() / 1000)
-    
-    // Log the click to modal_clicks table
-    try {
-      await fetch('/api/v1/modal/log-click', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({
-          userId: userId || 'anonymous',
-          sessionId: session?.sessionId || 'unknown',
-          level: counters?.level || 1,
-          clickType: 'bonus',
-          modalType: 'level_up',
-          additionalData: {
-            clickId: clickId,
-            externalLink: true,
-            targetUrl: 'himfls.com'
-          }
-        }),
-      })
-    } catch (error) {
-      console.error('Failed to log modal click:', error)
-    }
+  async function startLevelBonus(clickId?: number) {
+    // Use provided CLICKID or generate new one
+    const finalClickId = clickId || Math.floor(Date.now() / 1000)
 
     // Construct the external link with CLICKID
-    const externalUrl = `https://himfls.com/track/Mzc2LjAuMy4zLjAuMC4wLjAuMC4wLjAuMA?_ocid=${clickId}&aff_subid=tgtma1`
+    const externalUrl = `https://himfls.com/track/Mzc2LjAuMy4zLjAuMC4wLjAuMC4wLjAuMA?_ocid=${finalClickId}&aff_subid=tgtma1`
     
     // Open the link in a new tab/window
     try {

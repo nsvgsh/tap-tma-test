@@ -2,7 +2,7 @@ interface ModalClickData {
   userId: string;
   sessionId: string;
   level: number;
-  clickType: 'try_for_free'; // Only TRY FOR FREE button clicks
+  clickType: 'try_for_free' | 'bonus'; // TRY FOR FREE and BONUS button clicks
   modalType?: string;
   additionalData?: Record<string, unknown>;
 }

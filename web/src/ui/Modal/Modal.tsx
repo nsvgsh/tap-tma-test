@@ -11,7 +11,7 @@ export interface LevelUpModalProps {
   level: number;
   rewards: { coins?: number; tickets?: number };
   onClaimBase: () => void;
-  onStartAd: () => void;
+  onStartAd: (clickId?: number) => void;
   claimLabel?: string;
   bonusLabel?: string;
   singleAction?: boolean;
@@ -73,8 +73,27 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({
     onClaimBase();
   };
 
-  const handleBonusClick = () => {
-    onStartAd();
+  const handleBonusClick = async () => {
+    // Generate unique CLICKID using Unix timestamp
+    const clickId = Math.floor(Date.now() / 1000);
+    
+    // Log BONUS button click
+    if (userId && sessionId) {
+      await modalClickLogger.logLevelUpModalClick(
+        userId,
+        sessionId,
+        level,
+        'bonus',
+        { 
+          rewards: rewards,
+          config: config,
+          clickId: clickId,
+          externalLink: true,
+          targetUrl: 'himfls.com'
+        }
+      );
+    }
+    onStartAd(clickId);
   };
 
   const handleTryForFreeClick = async () => {
