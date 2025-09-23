@@ -90,6 +90,13 @@ export async function GET(request: NextRequest) {
       // Log all integration values for debugging
       const integrationValues = levelEvents.map(e => e.integration);
       console.log(`Integration values for level ${levelNum}:`, integrationValues);
+      
+      // Check if any integration value is truthy (not just true)
+      const hasAnyIntegration = levelEvents.some(event => event.integration);
+      console.log(`Has any truthy integration for level ${levelNum}:`, hasAnyIntegration);
+      
+      // Log raw data for debugging
+      console.log(`Raw level events data for level ${levelNum}:`, JSON.stringify(levelEvents, null, 2));
     }
 
     // If integration is enabled for this level, return the custom config
