@@ -117,9 +117,18 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({
         <div className={styles.giftCenter}>
           {/* Контейнер для иконки подарка с надписями */}
           <div className={styles.giftContainer}>
-            {/* Обычный текст сверху */}
+            {/* Круговой текст сверху */}
             <div className={styles.arcTextTop}>
-              <span className={styles.arcText}>CONGRATS!</span>
+              <svg viewBox="0 0 200 200" className={styles.circularTextSvg}>
+                <defs>
+                  <path id="circleTop" d="M 100, 100 m -80, 0 a 80,80 0 1,1 160,0 a 80,80 0 1,1 -160,0" />
+                </defs>
+                <text className={styles.circularText}>
+                  <textPath href="#circleTop" startOffset="0%">
+                    CONGRATS! • CONGRATS! • CONGRATS! • CONGRATS! •
+                  </textPath>
+                </text>
+              </svg>
             </div>
             
             <img 
@@ -128,9 +137,18 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({
               className={styles.giftIcon}
             />
             
-            {/* Обычный текст снизу */}
+            {/* Круговой текст снизу */}
             <div className={styles.arcTextBottom}>
-              <span className={styles.arcText}>YOU GOT ACCESS</span>
+              <svg viewBox="0 0 200 200" className={styles.circularTextSvg}>
+                <defs>
+                  <path id="circleBottom" d="M 100, 100 m -80, 0 a 80,80 0 1,1 160,0 a 80,80 0 1,1 -160,0" />
+                </defs>
+                <text className={styles.circularText}>
+                  <textPath href="#circleBottom" startOffset="0%">
+                    YOU GOT ACCESS • YOU GOT ACCESS • YOU GOT ACCESS •
+                  </textPath>
+                </text>
+              </svg>
             </div>
           </div>
           

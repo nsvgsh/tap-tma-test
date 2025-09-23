@@ -221,6 +221,15 @@
     width: 70px;
     height: 70px;
   }
+  
+  .circularTextSvg {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .circularText {
+    font-size: 14px;
+  }
 }
 
 
@@ -267,6 +276,9 @@
   text-align: center;
   width: 100%;
   pointer-events: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .arcTextBottom {
@@ -274,15 +286,24 @@
   text-align: center;
   width: 100%;
   pointer-events: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-.arcText {
+.circularTextSvg {
+  width: 120px;
+  height: 120px;
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.circularText {
   font-family: 'Lilita One', sans-serif;
   font-weight: 700;
-  font-size: clamp(16px, 5cqw, 28px); /* Responsive scaling like Button */
+  font-size: 16px;
   letter-spacing: 1px;
-  color: #FFD700;
-  text-shadow: 0 2px 4px rgba(255, 215, 0, 0.3);
+  fill: #FFD700;
   filter: drop-shadow(0 2px 4px rgba(255, 215, 0, 0.3));
 }
 
