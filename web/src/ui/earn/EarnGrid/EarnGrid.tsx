@@ -1,7 +1,7 @@
 import React from 'react'
 import styles from './EarnGrid.module.css'
 import { Tile, EarnTile } from '../Tile/Tile'
-import { WideTile } from '../WideTile/WideTile'
+import { WideEarnTile } from '../../WideEarnTile/WideEarnTile'
 import { EmptyState } from '../EmptyState/EmptyState'
 import { TileSkeleton } from '../Skeletons/TileSkeleton'
 
@@ -83,7 +83,7 @@ export function EarnGrid(props: {
       ) : (
         <div className={styles.grid}>
           {showWideButton && (
-            <WideTile
+            <WideEarnTile
               id="wide-trial-button"
               badgeNumber={0}
               icon="chest"

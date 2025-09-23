@@ -1,0 +1,28 @@
+/* Independent Badge styles - not affected by parent styles */
+.root {
+  position: relative;
+  display: inline-block;
+  isolation: isolate; /* Create new stacking context */
+}
+
+.img {
+  height: clamp(24px, 11.5cqw, 80px); /* Half the cqw value since WideEarnTile is 2x wider */
+  width: auto;
+  display: block;
+}
+
+.num {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: translate(-0.1cqw, -0.3cqw); /* Half the transform values since WideEarnTile is 2x wider */
+  font-family: 'Lilita One';
+  font-size: clamp(12px, 6cqw, 42px); /* Half the cqw value since WideEarnTile is 2x wider */
+  font-weight: 400;
+  color: #ffffff;
+  -webkit-text-stroke: 0.015em #000000;
+  filter: drop-shadow(0 0.08em 0 #000000);
+  line-height: 1;
+}
