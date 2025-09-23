@@ -384,16 +384,7 @@ export default function Home() {
     }
   }, [readUnlockForTask])
 
-  // Периодическое обновление задач в EARN секции для отслеживания postback событий
-  useEffect(() => {
-    if (activeSection !== 'offers') return
-    
-    const interval = setInterval(() => {
-      loadTasks()
-    }, 5000) // Обновляем каждые 5 секунд когда пользователь в EARN секции
-    
-    return () => clearInterval(interval)
-  }, [activeSection, loadTasks])
+  // Обновление задач только при открытии EARN секции (убрано периодическое обновление)
 
   // Watch ad for a specific task (intent-coupled)
   async function watchAdForTask(taskId: string) {

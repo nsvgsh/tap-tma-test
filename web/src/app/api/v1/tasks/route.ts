@@ -21,9 +21,22 @@ export async function GET() {
 
     // Проверяем Monetag события для task_claim (только closed события)
     const monetagClosedEvents = await c.query(
-      'select id from ad_events where user_id=$1 and provider=$2 and placement=$3 and status=$4',
+      'select reward_payload from ad_events where user_id=$1 and provider=$2 and placement=$3 and status=$4',
       [userId, 'monetag', 'task_claim', 'closed']
     )
+
+    // Создаем Set с taskId из Monetag событий
+    const monetagCompletedTasks = new Set<string>()
+    for (const event of monetagClosedEvents.rows) {
+      const payload = event.reward_payload
+      if (payload && typeof payload === 'object' && 'intent' in payload) {
+        const intent = payload.intent as string
+        if (intent.startsWith('task:')) {
+          const taskId = intent.replace('task:', '')
+          monetagCompletedTasks.add(taskId)
+        }
+      }
+    }
 
     const progressByTaskId = new Map<string, { taskId: string; state: string; claimedAt: string | null }>()
     for (const p of prog.rows as { taskId: string; state: string; claimedAt: string | null }[]) {
@@ -39,8 +52,8 @@ export async function GET() {
           return { ...d, state: 'claimed' }
         }
         
-        // Если есть Monetag closed события для task_claim, помечаем задачу как claimed
-        if (monetagClosedEvents.rows.length > 0 && d.verification === 'none') {
+        // Если есть Monetag closed событие для этой конкретной задачи, помечаем как claimed
+        if (monetagCompletedTasks.has(d.taskId) && d.verification === 'none') {
           return { ...d, state: 'claimed' }
         }
         
