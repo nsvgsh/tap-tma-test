@@ -183,9 +183,6 @@
 }
 
 /* Ensure consistent scaling for custom modal buttons - inherit all styles from .ctaButton */
-.giftCenter .ctaButton {
-  /* All styles inherited from .ctaButton - no overrides needed */
-}
 
 /* Mobile responsiveness for 320px width */
 @media (max-width: 320px) {
@@ -215,12 +212,14 @@
     font-size: clamp(14px, 4cqw, 20px); /* Responsive scaling for mobile */
   }
   
-  .arcTextTop {
-    top: -25px; /* Строго над подарком на мобильных */
+  .giftContainer {
+    min-height: 100px; /* Уменьшенная высота для мобильных */
+    gap: 6px; /* Меньший отступ между элементами */
   }
   
-  .arcTextBottom {
-    bottom: -25px; /* Строго под подарком на мобильных */
+  .giftIcon {
+    width: 70px;
+    height: 70px;
   }
 }
 
@@ -243,39 +242,38 @@
 
 .giftContainer {
   position: relative;
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
   align-items: center;
-  justify-content: center;
+  justify-items: center;
+  gap: 8px;
+  min-height: 120px; /* Минимальная высота для контейнера */
 }
 
 .giftIcon {
   width: 80px;
   height: 80px;
   object-fit: contain;
+  grid-row: 2;
+  justify-self: center;
+  align-self: center;
 }
 
 /* Split rewards label for custom levels - removed, now using individual positioning */
 
-/* Circular text styling like EmojiClicker but without rotation */
+/* Text styling for grid layout */
 .arcTextTop {
-  position: absolute;
-  top: -30px; /* Строго над подарком */
-  left: 50%;
-  transform: translate(-50%, 0);
-  z-index: 3;
-  pointer-events: none;
+  grid-row: 1;
   text-align: center;
+  width: 100%;
+  pointer-events: none;
 }
 
 .arcTextBottom {
-  position: absolute;
-  bottom: -30px; /* Строго под подарком */
-  left: 50%;
-  transform: translate(-50%, 0);
-  z-index: 3;
-  pointer-events: none;
+  grid-row: 3;
   text-align: center;
+  width: 100%;
+  pointer-events: none;
 }
 
 .arcText {
