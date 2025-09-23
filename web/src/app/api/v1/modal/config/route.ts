@@ -36,16 +36,14 @@ export async function GET(request: NextRequest) {
     }
 
     // Check if this level has integration enabled
-    const { data: levelEvent, error: levelError } = await supabase
+    const { data: levelEvents, error: levelError } = await supabase
       .from('level_events')
       .select('integration')
       .eq('level', levelNum)
-      .eq('integration', true)
       .order('created_at', { ascending: false })
-      .limit(1)
-      .single();
+      .limit(10);
 
-    if (levelError && levelError.code !== 'PGRST116') {
+    if (levelError) {
       console.error('Error checking level integration:', levelError);
       return NextResponse.json(
         { error: 'Failed to check level integration' },
@@ -53,8 +51,17 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    // Check if any recent level event has integration enabled
+    const hasIntegration = levelEvents && levelEvents.some(event => event.integration === true);
+
+    console.log(`Level ${levelNum} integration check:`, {
+      levelEvents: levelEvents?.length || 0,
+      hasIntegration,
+      events: levelEvents?.map(e => ({ integration: e.integration }))
+    });
+
     // If integration is enabled for this level, return the custom config
-    if (levelEvent) {
+    if (hasIntegration) {
       // For now, return the same config for all integrated levels
       // In the future, this could be stored in a separate table
       const customConfig = {

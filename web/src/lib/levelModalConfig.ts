@@ -27,13 +27,18 @@ export const getLevelModalConfig = async (level: number): Promise<LevelModalConf
   }
 
   try {
+    console.log(`Fetching modal config for level ${level}`);
     const response = await fetch(`/api/v1/modal/config?level=${level}`);
     const data = await response.json();
 
+    console.log(`Modal config response for level ${level}:`, data);
+
     if (data.success && data.hasCustomConfig) {
+      console.log(`Using custom config for level ${level}:`, data.config);
       configCache.set(level, data.config);
       return data.config;
     } else {
+      console.log(`No custom config for level ${level}, using default`);
       configCache.set(level, null);
       return undefined;
     }
