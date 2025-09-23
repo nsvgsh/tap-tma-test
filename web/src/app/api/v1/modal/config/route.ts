@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
     // Test database connection first
     console.log('Testing database connection...');
     const { data: testData, error: testError } = await supabase
-      .from('level_events')
+      .from('level_reward_templates')
       .select('count')
       .limit(1);
     
@@ -52,51 +52,53 @@ export async function GET(request: NextRequest) {
     
     console.log('Database connection successful');
 
-    // Check if this level has integration enabled
-    console.log(`Querying level_events for level ${levelNum}...`);
-    const { data: levelEvents, error: levelError } = await supabase
-      .from('level_events')
-      .select('integration, level, created_at, user_id')
+    // Check if this level has integration enabled in templates
+    console.log(`Querying level_reward_templates for level ${levelNum}...`);
+    const { data: templates, error: templateError } = await supabase
+      .from('level_reward_templates')
+      .select('integration, level, active, template_id, created_at')
       .eq('level', levelNum)
-      .order('created_at', { ascending: false })
+      .eq('active', true)
+      .order('updated_at', { ascending: false })
       .limit(10);
 
-    if (levelError) {
-      console.error('Error checking level integration:', levelError);
+    if (templateError) {
+      console.error('Error checking level templates:', templateError);
       return NextResponse.json(
-        { error: 'Failed to check level integration' },
+        { error: 'Failed to check level templates' },
         { status: 500 }
       );
     }
 
-    // Check if any recent level event has integration enabled
-    const hasIntegration = levelEvents && levelEvents.some(event => event.integration === true);
+    // Check if any active template has integration enabled
+    const hasIntegration = templates && templates.some(template => template.integration === true);
 
-    console.log(`Level ${levelNum} integration check:`, {
-      levelEvents: levelEvents?.length || 0,
+    console.log(`Level ${levelNum} template integration check:`, {
+      templates: templates?.length || 0,
       hasIntegration,
-      events: levelEvents?.map(e => ({ 
-        level: e.level, 
-        integration: e.integration, 
-        user_id: e.user_id,
-        created_at: e.created_at 
+      templateData: templates?.map(t => ({ 
+        level: t.level, 
+        integration: t.integration, 
+        active: t.active,
+        template_id: t.template_id,
+        created_at: t.created_at 
       }))
     });
 
-    // If no events found for this level, log a warning
-    if (!levelEvents || levelEvents.length === 0) {
-      console.warn(`No level_events found for level ${levelNum}. Make sure the level exists in the database.`);
+    // If no templates found for this level, log a warning
+    if (!templates || templates.length === 0) {
+      console.warn(`No active level_reward_templates found for level ${levelNum}. Make sure the level template exists in the database.`);
     } else {
       // Log all integration values for debugging
-      const integrationValues = levelEvents.map(e => e.integration);
+      const integrationValues = templates.map(t => t.integration);
       console.log(`Integration values for level ${levelNum}:`, integrationValues);
       
       // Check if any integration value is truthy (not just true)
-      const hasAnyIntegration = levelEvents.some(event => event.integration);
+      const hasAnyIntegration = templates.some(template => template.integration);
       console.log(`Has any truthy integration for level ${levelNum}:`, hasAnyIntegration);
       
       // Log raw data for debugging
-      console.log(`Raw level events data for level ${levelNum}:`, JSON.stringify(levelEvents, null, 2));
+      console.log(`Raw template data for level ${levelNum}:`, JSON.stringify(templates, null, 2));
     }
 
     // If integration is enabled for this level, return the custom config
