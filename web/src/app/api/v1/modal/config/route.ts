@@ -138,7 +138,7 @@ export async function GET(request: NextRequest) {
         rewardsLabel: "CONGRATS! YOU GOT ACCESS",
         rewardsLayout: "gift-center",
         actionsLayout: "wide-green",
-        giftIcon: "/ui/bottomnav/assets/Icon_ImageIcon_Gift_Purple.png"
+        giftIcon: "/ui/emojis/congrats.png"
       };
 
       return NextResponse.json({

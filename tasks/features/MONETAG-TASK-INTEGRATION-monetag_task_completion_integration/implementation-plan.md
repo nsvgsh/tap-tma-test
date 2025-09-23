@@ -42,3 +42,4 @@
 - Unit тесты для postback endpoint
 - Integration тесты для проверки обновления task_progress
 - E2E тесты для проверки отображения в EARN секции
+

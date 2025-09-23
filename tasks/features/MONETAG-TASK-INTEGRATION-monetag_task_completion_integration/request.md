@@ -32,3 +32,4 @@
 - Event data: `{zone_id: 9667281, request_var: "task_claim", event_type: "impression", reward_event_type: "non_valued", sub_zone_id: 9667281, variable2: "user_id:impression_id"}`
 - Нужно извлекать `user_id` из `variable2` поля
 - Обновлять `task_progress` таблицу для соответствующего пользователя и задачи
+
