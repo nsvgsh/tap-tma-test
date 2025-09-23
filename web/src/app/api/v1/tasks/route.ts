@@ -50,8 +50,9 @@ export async function GET() {
       progressByTaskId.set(p.taskId, p)
     }
 
-    const definitions = (defs.rows as { taskId: string; unlockLevel: number; kind: string; rewardPayload: unknown; verification: string; wide: boolean }[]).map(
-      (d) => {
+    const definitions = (defs.rows as { taskId: string; unlockLevel: number; kind: string; rewardPayload: unknown; verification: string; wide: boolean }[])
+      .filter(d => !d.wide) // Исключаем широкие задачи из обычного списка
+      .map((d) => {
         const p = progressByTaskId.get(d.taskId)
         
         // Если задача уже помечена как claimed в task_progress, используем это состояние
@@ -64,21 +65,10 @@ export async function GET() {
           return { ...d, state: 'claimed' }
         }
         
-        // Специальная логика для широких задач (wide = true)
-        if (d.wide) {
-          // Если у пользователя есть клики try_for_free, скрываем широкую задачу
-          if (hasTryForFreeClick) {
-            return { ...d, state: 'hidden' }
-          }
-          // Иначе показываем как available
-          return { ...d, state: 'available' }
-        }
-        
-        // Иначе используем стандартную логику разблокировки по уровню
+        // Используем стандартную логику разблокировки по уровню для обычных задач
         const state = d.unlockLevel <= userLevel ? 'available' : 'locked'
         return { ...d, state }
-      }
-    )
+      })
 
     return { definitions, progress: prog.rows, userLevel }
   })
