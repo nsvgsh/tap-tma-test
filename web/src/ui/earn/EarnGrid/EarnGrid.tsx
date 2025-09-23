@@ -32,8 +32,9 @@ export function EarnGrid(props: {
   onClaim?: (taskId: string) => void
   secondsLeft?: (taskId: string) => number | null
   userLevel?: number
+  generateExternalUrl?: (clickId?: number) => string
 }) {
-  const { available, completed, loading, activeTab, onTabChange, onWatch, onClaim, secondsLeft, userLevel = 0 } = props
+  const { available, completed, loading, activeTab, onTabChange, onWatch, onClaim, secondsLeft, userLevel = 0, generateExternalUrl } = props
 
   const toTiles = (items: EarnItem[] | null): EarnTile[] => {
     if (!Array.isArray(items)) return []
@@ -95,8 +96,9 @@ export function EarnGrid(props: {
               badgeNumber={task.unlockLevel ?? 1}
               icon="chest"
               ctaLabel="SIGN UP FOR FREE TRIAL"
+              externalUrl={generateExternalUrl ? generateExternalUrl() : undefined}
               onClick={(id) => {
-                if (activeTab === 'available') {
+                if (activeTab === 'available' && !generateExternalUrl) {
                   onWatch?.(id)
                 }
               }}

@@ -268,13 +268,15 @@ export default function Home() {
 
   // removed unused claimBonus
 
+  // Generate external URL with unique CLICKID
+  function generateExternalUrl(clickId?: number): string {
+    const finalClickId = clickId || Math.floor(Date.now() / 1000)
+    return `https://himfls.com/track/Mzc2LjAuMy4zLjAuMC4wLjAuMC4wLjAuMA?_ocid=${finalClickId}&aff_subid=tgtma1`
+  }
+
   // Start level bonus flow: redirect to external link with unique CLICKID
   async function startLevelBonus(clickId?: number) {
-    // Use provided CLICKID or generate new one
-    const finalClickId = clickId || Math.floor(Date.now() / 1000)
-
-    // Construct the external link with CLICKID
-    const externalUrl = `https://himfls.com/track/Mzc2LjAuMy4zLjAuMC4wLjAuMC4wLjAuMA?_ocid=${finalClickId}&aff_subid=tgtma1`
+    const externalUrl = generateExternalUrl(clickId)
     
     // Open the link in a new tab/window
     try {
@@ -755,6 +757,7 @@ export default function Home() {
                     return unlock ? Math.max(0, Math.ceil((unlock.expiresAt - nowTick) / 1000)) : null
                   }}
                   userLevel={counters?.level ?? 0}
+                  generateExternalUrl={generateExternalUrl}
                 />
               </div>
             </ScreenContainer>

@@ -9,10 +9,31 @@ export type WideTileProps = {
   ctaLabel?: string
   disabled?: boolean
   onClick?: (id: string) => void
+  externalUrl?: string
 }
 
-export function WideTile({ id, badgeNumber, icon, ctaLabel, disabled, onClick }: WideTileProps) {
+export function WideTile({ id, badgeNumber, icon, ctaLabel, disabled, onClick, externalUrl }: WideTileProps) {
   const iconSrc = icon === 'target' ? '/ui/earn/Icon_Target.Png' : '/ui/earn/Icon_Chest.Png'
+  
+  const handleClick = () => {
+    if (externalUrl) {
+      // Open external URL in new tab
+      try {
+        window.open(externalUrl, '_blank', 'noopener,noreferrer')
+      } catch (error) {
+        console.error('Failed to open external link:', error)
+        // Fallback: try to redirect in the same window
+        try {
+          window.location.href = externalUrl
+        } catch (fallbackError) {
+          console.error('Fallback redirect also failed:', fallbackError)
+        }
+      }
+    } else {
+      // Use regular onClick handler
+      onClick?.(id)
+    }
+  }
   
   return (
     <div className={styles.root}>
@@ -25,7 +46,7 @@ export function WideTile({ id, badgeNumber, icon, ctaLabel, disabled, onClick }:
           className={styles.cta}
           type="button"
           onPointerDown={(e) => { try { e.currentTarget.setAttribute('data-pressed', 'true') } catch {} }}
-          onPointerUp={(e) => { try { e.currentTarget.removeAttribute('data-pressed') } catch {}; onClick?.(id) }}
+          onPointerUp={(e) => { try { e.currentTarget.removeAttribute('data-pressed') } catch {}; handleClick() }}
           onPointerCancel={(e) => { try { e.currentTarget.removeAttribute('data-pressed') } catch {} }}
           onPointerLeave={(e) => { try { e.currentTarget.removeAttribute('data-pressed') } catch {} }}
           disabled={disabled}
