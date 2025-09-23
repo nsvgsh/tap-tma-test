@@ -305,7 +305,12 @@ export function EmojiClicker(props: EmojiClickerProps) {
       />
       <div 
         className={styles.circularText}
-        style={{ opacity: hintOpacity, transition: 'opacity 0.3s ease' }}
+        style={{ 
+          opacity: hintOpacity, 
+          transition: 'opacity 0.3s ease',
+          width: `${size * 1.53}px`,
+          height: `${size * 1.53}px`
+        }}
       >
         <svg viewBox="0 0 220 220">
           <defs>
@@ -313,7 +318,7 @@ export function EmojiClicker(props: EmojiClickerProps) {
           </defs>
           <text>
             <textPath href="#circle" startOffset="0%">
-              START TAP TO EARN REAL CASH 
+              START TAP&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;TO EARN REAL CASH 
             </textPath>
           </text>
         </svg>

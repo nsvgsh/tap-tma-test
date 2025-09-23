@@ -78,8 +78,8 @@ export function BottomNavShadow({
           notificationDot.className = 'notification-dot'
           notificationDot.style.cssText = `
             position: absolute;
-            top: 8px;
-            right: 8px;
+            top: -6px;
+            right: -6px;
             width: 12px;
             height: 12px;
             background: #ff4444;
