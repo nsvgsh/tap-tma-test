@@ -55,3 +55,4 @@
 | UI-EARN-NOTIFICATIONS-3 | Added logic to track when new tasks appear (on level up) and manage notification state |
 | UI-EARN-NOTIFICATIONS-4 | Stop shaking after 5 taps or when user enters EARN section |
 | UI-EARN-NOTIFICATIONS-5 | Remove red dot only when user enters EARN section |
+| MODAL-LINK-0001 | Added external link redirect for BONUS button in level-up modal with unique CLICKID generation and modal_clicks logging |

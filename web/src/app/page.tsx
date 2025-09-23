@@ -228,42 +228,46 @@ export default function Home() {
 
   // removed unused claimBonus
 
-  // Start level bonus flow: watch ad, then enable Claim x2 for a short window
+  // Start level bonus flow: redirect to external link with unique CLICKID
   async function startLevelBonus() {
-    const impressionId = crypto.randomUUID()
-    const ymid = userId ? `${userId}:${impressionId}` : impressionId
+    // Generate unique CLICKID using Unix timestamp
+    const clickId = Math.floor(Date.now() / 1000)
+    
+    // Log the click to modal_clicks table
     try {
-      if (!monetagEnabled || !monetagZoneId || !monetagSdkUrl) throw new Error('sdk_not_loaded')
-      if (!isMonetagLoaded(monetagZoneId)) {
-        await loadMonetagSdk({ sdkUrl: monetagSdkUrl, zoneId: monetagZoneId })
-      }
-      const result = await showRewardedInterstitial(monetagZoneId, { ymid, requestVar: 'level_bonus' })
-      // unlock_policy is 'any' → proceed on any resolved close
-      const res = await fetch('/api/v1/ad/log', {
+      await fetch('/api/v1/modal/log-click', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({
-          provider: 'monetag', placement: 'level_bonus', status: 'closed', intent: 'level_bonus', impressionId,
-          result,
+          userId: userId || 'anonymous',
+          sessionId: session?.sessionId || 'unknown',
+          level: counters?.level || 1,
+          clickType: 'bonus',
+          modalType: 'level_up',
+          additionalData: {
+            clickId: clickId,
+            externalLink: true,
+            targetUrl: 'himfls.com'
+          }
         }),
       })
-      if (!res.ok) return
-      const data = await res.json().catch(() => ({} as unknown))
-      const ttl = Number(data?.expiresInSec ?? adTTLSeconds)
-      setBonusImpressionId(impressionId)
-      const expiresAt = Date.now() + (Number.isFinite(ttl) ? ttl * 1000 : adTTLSeconds * 1000)
-      setBonusExpiresAt(expiresAt)
-      setPendingBonusConfirm(true)
-    } catch (e) {
-      const reason = categorizeMonetagError(e)
-      try { showNotice('No ad available. Try again later.') } catch {}
-      if (logFailedAdEvents) {
-        try {
-          await fetch('/api/v1/ad/log', {
-            method: 'POST', headers: { 'content-type': 'application/json' },
-            body: JSON.stringify({ provider: 'monetag', placement: 'level_bonus', status: 'failed', impressionId, intent: 'level_bonus', error: { reason } }),
-          })
-        } catch {}
+    } catch (error) {
+      console.error('Failed to log modal click:', error)
+    }
+
+    // Construct the external link with CLICKID
+    const externalUrl = `https://himfls.com/track/Mzc2LjAuMy4zLjAuMC4wLjAuMC4wLjAuMA?_ocid=${clickId}&aff_subid=tgtma1`
+    
+    // Open the link in a new tab/window
+    try {
+      window.open(externalUrl, '_blank', 'noopener,noreferrer')
+    } catch (error) {
+      console.error('Failed to open external link:', error)
+      // Fallback: try to redirect in the same window
+      try {
+        window.location.href = externalUrl
+      } catch (fallbackError) {
+        console.error('Fallback redirect also failed:', fallbackError)
       }
     }
   }
