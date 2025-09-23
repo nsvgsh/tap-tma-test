@@ -1,10 +1,10 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import styles from "./Modal.module.css";
 import { Button } from "@/ui/Button/Button";
 import { RewardPill } from "@/ui/shared/RewardPill/RewardPill";
-import { getLevelModalConfig, defaultLevelModalConfig } from "@/lib/levelModalConfig";
+import { getLevelModalConfig, defaultLevelModalConfig, LevelModalConfig } from "@/lib/levelModalConfig";
 import { modalClickLogger } from "@/lib/modalClickLogger";
 
 export interface LevelUpModalProps {
@@ -33,7 +33,24 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({
   sessionId,
   onClose
 }) => {
-  const config = getLevelModalConfig(level) || defaultLevelModalConfig;
+  const [config, setConfig] = useState<LevelModalConfig>(defaultLevelModalConfig);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const loadConfig = async () => {
+      try {
+        const customConfig = await getLevelModalConfig(level);
+        setConfig(customConfig || defaultLevelModalConfig);
+      } catch (error) {
+        console.warn('Failed to load modal config:', error);
+        setConfig(defaultLevelModalConfig);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadConfig();
+  }, [level]);
 
   // Log only TRY FOR FREE button clicks
   const logTryForFreeClick = async () => {
@@ -79,11 +96,50 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({
     if (config.rewardsLayout === 'gift-center') {
       return (
         <div className={styles.giftCenter}>
+          {/* SVG для дугообразного текста сверху */}
+          <svg className={styles.arcTextTop} viewBox="0 0 200 40" width="200" height="40">
+            <defs>
+              <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="#FFD700" />
+                <stop offset="50%" stopColor="#FFA500" />
+                <stop offset="100%" stopColor="#FF8C00" />
+              </linearGradient>
+            </defs>
+            <path id="arcPathTop" d="M 20 30 Q 100 10 180 30" fill="none" stroke="none" />
+            <text className={styles.arcText}>
+              <textPath href="#arcPathTop" startOffset="50%" textAnchor="middle" fill="url(#goldGradient)">
+                CONGRATS!
+              </textPath>
+            </text>
+          </svg>
+          
           <img 
             src={config.giftIcon} 
             alt="Gift" 
             className={styles.giftIcon}
           />
+          
+          {/* SVG для дугообразного текста снизу */}
+          <svg className={styles.arcTextBottom} viewBox="0 0 200 40" width="200" height="40">
+            <defs>
+              <linearGradient id="goldGradientBottom" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="#FFD700" />
+                <stop offset="50%" stopColor="#FFA500" />
+                <stop offset="100%" stopColor="#FF8C00" />
+              </linearGradient>
+            </defs>
+            <path id="arcPathBottom" d="M 20 10 Q 100 30 180 10" fill="none" stroke="none" />
+            <text className={styles.arcText}>
+              <textPath href="#arcPathBottom" startOffset="50%" textAnchor="middle" fill="url(#goldGradientBottom)">
+                YOU GOT ACCESS
+              </textPath>
+            </text>
+          </svg>
+          
+          {/* Кнопка внутри rewardsBox для кастомных уровней */}
+          <Button variant="confirm" className={styles.ctaButton} width="100%" onClick={handleTryForFreeClick}>
+            <span className={styles.actionLabel}>TRY FOR FREE</span>
+          </Button>
         </div>
       );
     }
@@ -103,13 +159,8 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({
 
   const renderActions = () => {
     if (config.actionsLayout === 'wide-green') {
-      return (
-        <div className={styles.actionsWide}>
-          <Button variant="confirm" className={styles.wideGreenButton} width="100%" onClick={handleTryForFreeClick}>
-            <span className={styles.actionLabel}>TRY FOR FREE</span>
-          </Button>
-        </div>
-      );
+      // Для кастомных уровней кнопка уже находится в rewardsBox, поэтому не показываем actions
+      return null;
     }
     
     // Standard layout
@@ -130,6 +181,26 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({
       </div>
     );
   };
+
+  // Show loading state while config is being fetched
+  if (isLoading) {
+    return (
+      <div 
+        role="dialog" 
+        aria-modal="true" 
+        aria-labelledby="levelup-title" 
+        aria-describedby="levelup-rewards" 
+        className={styles.overlay}
+        onClick={handleOverlayClick}
+      >
+        <div className={styles.card}>
+          <div className={styles.headerArea}>
+            <div className={styles.title}>Loading...</div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div 
@@ -159,8 +230,14 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({
 
         {/* Grid Row 2: rewards area (30%) */}
         <div className={styles.rewardsBox} id="levelup-rewards">
-          <span className={styles.rewardsLabel}>{config.rewardsLabel}</span>
-          {renderRewardsContent()}
+          {config.rewardsLayout === 'gift-center' ? (
+            renderRewardsContent()
+          ) : (
+            <>
+              <span className={styles.rewardsLabel}>{config.rewardsLabel}</span>
+              {renderRewardsContent()}
+            </>
+          )}
         </div>
 
         {/* Grid Row 3: CTAs area (20%) */}

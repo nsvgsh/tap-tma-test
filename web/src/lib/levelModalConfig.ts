@@ -15,35 +15,42 @@ export const defaultLevelModalConfig: LevelModalConfig = {
   actionsLayout: "standard",
 };
 
-// JSON конфигурация для кастомных модальных окон
-export const levelModalConfigs: LevelModalConfigs = {
-  1: {
-    rewardsLabel: "CONGRATS! YOU GOT ACCESS",
-    rewardsLayout: "gift-center",
-    actionsLayout: "wide-green",
-    giftIcon: "/ui/bottomnav/assets/Icon_ImageIcon_Gift_Purple.png"
-  },
-  // Добавьте здесь другие уровни по необходимости
-  5: {
-    rewardsLabel: "CONGRATS! YOU GOT ACCESS",
-    rewardsLayout: "gift-center",
-    actionsLayout: "wide-green",
-    giftIcon: "/ui/bottomnav/assets/Icon_ImageIcon_Gift_Purple.png"
-  },
-  // 10: {
-  //   rewardsLabel: "MILESTONE ACHIEVED!",
-  //   rewardsLayout: "gift-center", 
-  //   actionsLayout: "wide-green",
-  //   giftIcon: "/ui/bottomnav/assets/Icon_ImageIcon_Gift_Purple.png"
-  // }
-};
+// Кэш для хранения конфигураций из базы данных
+const configCache = new Map<number, LevelModalConfig | null>();
 
-// Функция для получения конфигурации уровня
-export const getLevelModalConfig = (level: number): LevelModalConfig | undefined => {
-  return levelModalConfigs[level];
+// Функция для получения конфигурации уровня из базы данных
+export const getLevelModalConfig = async (level: number): Promise<LevelModalConfig | undefined> => {
+  // Проверяем кэш
+  if (configCache.has(level)) {
+    const cached = configCache.get(level);
+    return cached || undefined;
+  }
+
+  try {
+    const response = await fetch(`/api/v1/modal/config?level=${level}`);
+    const data = await response.json();
+
+    if (data.success && data.hasCustomConfig) {
+      configCache.set(level, data.config);
+      return data.config;
+    } else {
+      configCache.set(level, null);
+      return undefined;
+    }
+  } catch (error) {
+    console.warn('Failed to fetch modal config from database:', error);
+    configCache.set(level, null);
+    return undefined;
+  }
 };
 
 // Функция для проверки есть ли кастомная конфигурация для уровня
-export const hasCustomModalConfig = (level: number): boolean => {
-  return level in levelModalConfigs;
+export const hasCustomModalConfig = async (level: number): Promise<boolean> => {
+  const config = await getLevelModalConfig(level);
+  return config !== undefined;
+};
+
+// Функция для очистки кэша (полезно для тестирования)
+export const clearModalConfigCache = (): void => {
+  configCache.clear();
 };
