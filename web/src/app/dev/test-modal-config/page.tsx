@@ -91,7 +91,7 @@ export default function TestModalConfigPage() {
         <h3>Instructions:</h3>
         <ol>
           <li>Make sure you have set <code>integration = true</code> for level 1 in your database</li>
-          <li>Click "Test Level 1" to see if it returns custom config</li>
+          <li>Click &quot;Test Level 1&quot; to see if it returns custom config</li>
           <li>Check browser console for detailed logs</li>
           <li>Check server logs for API debugging info</li>
         </ol>

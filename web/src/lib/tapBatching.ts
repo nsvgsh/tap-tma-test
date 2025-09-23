@@ -114,7 +114,7 @@ export class TapBatcher {
     try {
       await this.onBatchProcess(tapsToProcess)
       this.state.lastProcessedTime = Date.now()
-    } catch (error) {
+    } catch {
       // Re-queue taps for retry (could implement exponential backoff here)
       this.state.pendingTaps.unshift(...tapsToProcess)
     } finally {

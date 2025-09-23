@@ -143,7 +143,7 @@ export function EmojiClicker(props: EmojiClickerProps) {
   const spanRef = useRef<HTMLSpanElement | null>(null)
   const [shapeRadius, setShapeRadius] = useState<number>(28)
   const [hintOpacity, setHintOpacity] = useState<number>(1)
-  const [recentTaps, setRecentTaps] = useState<number>(0)
+  // Removed unused variable: recentTaps
   const timeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   // Heuristic: adjust border radius by visual width ratio of the media (image or emoji fallback)
