@@ -216,11 +216,11 @@
   }
   
   .arcTextTop {
-    top: 15%; /* Closer to icon on mobile */
+    top: -30px; /* Строго над подарком на мобильных */
   }
   
   .arcTextBottom {
-    bottom: 15%; /* Closer to icon on mobile */
+    bottom: -30px; /* Строго под подарком на мобильных */
   }
 }
 
@@ -252,9 +252,9 @@
 /* Circular text styling like EmojiClicker but without rotation */
 .arcTextTop {
   position: absolute;
-  top: 20%;
+  top: -40px; /* Строго над подарком */
   left: 50%;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, 0);
   z-index: 3;
   pointer-events: none;
   text-align: center;
@@ -262,9 +262,9 @@
 
 .arcTextBottom {
   position: absolute;
-  bottom: 20%;
+  bottom: -40px; /* Строго под подарком */
   left: 50%;
-  transform: translate(-50%, 50%);
+  transform: translate(-50%, 0);
   z-index: 3;
   pointer-events: none;
   text-align: center;
