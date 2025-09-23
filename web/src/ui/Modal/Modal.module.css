@@ -216,11 +216,11 @@
   }
   
   .arcTextTop {
-    top: -30px; /* Строго над подарком на мобильных */
+    top: -25px; /* Строго над подарком на мобильных */
   }
   
   .arcTextBottom {
-    bottom: -30px; /* Строго под подарком на мобильных */
+    bottom: -25px; /* Строго под подарком на мобильных */
   }
 }
 
@@ -241,6 +241,14 @@
   container-type: inline-size; /* Enable cqw units for responsive scaling */
 }
 
+.giftContainer {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
 .giftIcon {
   width: 80px;
   height: 80px;
@@ -252,7 +260,7 @@
 /* Circular text styling like EmojiClicker but without rotation */
 .arcTextTop {
   position: absolute;
-  top: -40px; /* Строго над подарком */
+  top: -30px; /* Строго над подарком */
   left: 50%;
   transform: translate(-50%, 0);
   z-index: 3;
@@ -262,7 +270,7 @@
 
 .arcTextBottom {
   position: absolute;
-  bottom: -40px; /* Строго под подарком */
+  bottom: -30px; /* Строго под подарком */
   left: 50%;
   transform: translate(-50%, 0);
   z-index: 3;

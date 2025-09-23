@@ -115,20 +115,23 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({
     if (config.rewardsLayout === 'gift-center') {
       return (
         <div className={styles.giftCenter}>
-          {/* Обычный текст сверху */}
-          <div className={styles.arcTextTop}>
-            <span className={styles.arcText}>CONGRATS!</span>
-          </div>
-          
-          <img 
-            src={config.giftIcon} 
-            alt="Gift" 
-            className={styles.giftIcon}
-          />
-          
-          {/* Обычный текст снизу */}
-          <div className={styles.arcTextBottom}>
-            <span className={styles.arcText}>YOU GOT ACCESS</span>
+          {/* Контейнер для иконки подарка с надписями */}
+          <div className={styles.giftContainer}>
+            {/* Обычный текст сверху */}
+            <div className={styles.arcTextTop}>
+              <span className={styles.arcText}>CONGRATS!</span>
+            </div>
+            
+            <img 
+              src={config.giftIcon} 
+              alt="Gift" 
+              className={styles.giftIcon}
+            />
+            
+            {/* Обычный текст снизу */}
+            <div className={styles.arcTextBottom}>
+              <span className={styles.arcText}>YOU GOT ACCESS</span>
+            </div>
           </div>
           
           {/* Кнопка внутри rewardsBox для кастомных уровней */}
