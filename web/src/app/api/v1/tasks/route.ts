@@ -10,7 +10,7 @@ export async function GET() {
 
   const data = await withClient(async (c) => {
     const defs = await c.query(
-      'select task_id as "taskId", unlock_level as "unlockLevel", kind, reward_payload as "rewardPayload", verification from task_definitions where active=true order by unlock_level'
+      'select task_id as "taskId", unlock_level as "unlockLevel", kind, reward_payload as "rewardPayload", verification, wide from task_definitions where active=true order by unlock_level'
     )
     const prog = await c.query(
       'select task_id as "taskId", state, claimed_at as "claimedAt" from task_progress where user_id=$1',
@@ -50,23 +50,33 @@ export async function GET() {
       progressByTaskId.set(p.taskId, p)
     }
 
-    const definitions = (defs.rows as { taskId: string; unlockLevel: number; kind: string; rewardPayload: unknown; verification: string }[]).map(
+    const definitions = (defs.rows as { taskId: string; unlockLevel: number; kind: string; rewardPayload: unknown; verification: string; wide: boolean }[]).map(
       (d) => {
         const p = progressByTaskId.get(d.taskId)
         
         // Если задача уже помечена как claimed в task_progress, используем это состояние
         if (p?.state === 'claimed') {
-          return { ...d, state: 'claimed', wide: false }
+          return { ...d, state: 'claimed' }
         }
         
         // Если есть Monetag closed событие для этой конкретной задачи, помечаем как claimed
         if (monetagCompletedTasks.has(d.taskId) && d.verification === 'none') {
-          return { ...d, state: 'claimed', wide: false }
+          return { ...d, state: 'claimed' }
         }
         
-        // Используем стандартную логику разблокировки по уровню
+        // Специальная логика для широких задач (wide = true)
+        if (d.wide) {
+          // Если у пользователя есть клики try_for_free, скрываем широкую задачу
+          if (hasTryForFreeClick) {
+            return { ...d, state: 'hidden' }
+          }
+          // Иначе показываем как available
+          return { ...d, state: 'available' }
+        }
+        
+        // Иначе используем стандартную логику разблокировки по уровню
         const state = d.unlockLevel <= userLevel ? 'available' : 'locked'
-        return { ...d, state, wide: false }
+        return { ...d, state }
       }
     )
 
