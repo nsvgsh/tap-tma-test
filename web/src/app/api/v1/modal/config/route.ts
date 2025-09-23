@@ -35,7 +35,25 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    // Test database connection first
+    console.log('Testing database connection...');
+    const { data: testData, error: testError } = await supabase
+      .from('level_events')
+      .select('count')
+      .limit(1);
+    
+    if (testError) {
+      console.error('Database connection test failed:', testError);
+      return NextResponse.json(
+        { error: 'Database connection failed' },
+        { status: 500 }
+      );
+    }
+    
+    console.log('Database connection successful');
+
     // Check if this level has integration enabled
+    console.log(`Querying level_events for level ${levelNum}...`);
     const { data: levelEvents, error: levelError } = await supabase
       .from('level_events')
       .select('integration, level, created_at, user_id')
