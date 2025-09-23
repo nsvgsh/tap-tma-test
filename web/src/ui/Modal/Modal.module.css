@@ -25,9 +25,9 @@
   background: radial-gradient(60% 50% at 50% 40%, #074274 0%, #082D53 60%, #082D53 100%);
   color: var(--theme-foreground);
   text-align: center;
-  display: grid;
-  grid-template-rows: auto minmax(0, 1fr) auto; /* header / scrollable rewards / sticky CTAs */
-  row-gap: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
   container-type: inline-size;
 }
 .headerArea {
@@ -118,9 +118,7 @@
   container-type: size;   
   container-name: rewards;
   overflow: visible;
-  min-height: 0;
-  /* margin-top: 12px; */
-  /* margin-bottom: 12px; */
+  flex: 1;
   padding: 14px 12px 4px 12px;
   border-radius: 16px;
   background: rgba(0,0,0,0.25);
@@ -128,6 +126,7 @@
   text-align: left;
   display: flex;
   flex-direction: column;
+  min-height: 0;
 }
 
 .rewardsLabel {
@@ -215,22 +214,12 @@
   }
   
   .giftContainer {
-    min-height: 100px; /* Уменьшенная высота для мобильных */
-    gap: 6px; /* Меньший отступ между элементами */
+    min-height: 150px; /* Высота для мобильных с учетом подарка 120x120 */
   }
   
   .giftIcon {
-    width: 70px;
-    height: 70px;
-  }
-  
-  .circularTextSvg {
-    width: 100px;
-    height: 100px;
-  }
-  
-  .circularText {
-    font-size: 14px;
+    width: 120px;
+    height: 120px;
   }
 }
 
@@ -277,11 +266,11 @@
 .giftCenter {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
-  flex: 1 1 auto;
+  flex: 1;
   padding: 0 8px 8px 8px;
-  gap: 4px;
+  gap: 16px;
   overflow: visible;
   position: relative;
   z-index: 1;
@@ -290,61 +279,22 @@
 
 .giftContainer {
   position: relative;
-  display: grid;
-  grid-template-rows: auto 1fr auto;
+  display: flex;
   align-items: center;
-  justify-items: center;
-  gap: 8px;
-  min-height: 120px; /* Минимальная высота для контейнера */
+  justify-content: center;
+  flex: 1;
+  min-height: 200px; /* Увеличиваем высоту для подарка 150x150 */
 }
 
 .giftIcon {
-  width: 80px;
-  height: 80px;
+  width: 150px;
+  height: 150px;
   object-fit: contain;
-  grid-row: 2;
-  justify-self: center;
-  align-self: center;
 }
 
 /* Split rewards label for custom levels - removed, now using individual positioning */
 
-/* Text styling for grid layout */
-.arcTextTop {
-  grid-row: 1;
-  text-align: center;
-  width: 100%;
-  pointer-events: none;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.arcTextBottom {
-  grid-row: 3;
-  text-align: center;
-  width: 100%;
-  pointer-events: none;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.circularTextSvg {
-  width: 120px;
-  height: 120px;
-  max-width: 100%;
-  max-height: 100%;
-}
-
-.circularText {
-  font-family: 'Lilita One', sans-serif;
-  font-weight: 700;
-  font-size: 16px;
-  letter-spacing: 1px;
-  fill: #FFD700;
-  filter: drop-shadow(0 2px 4px rgba(255, 215, 0, 0.3));
-}
+/* Удалены неиспользуемые стили для кругового текста */
 
 /* Старые стили для fallback (если SVG не поддерживается) */
 .rewardsLabelTop {

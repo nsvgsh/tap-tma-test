@@ -115,41 +115,13 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({
     if (config.rewardsLayout === 'gift-center') {
       return (
         <div className={styles.giftCenter}>
-          {/* Контейнер для иконки подарка с надписями */}
+          {/* Контейнер для иконки подарка */}
           <div className={styles.giftContainer}>
-            {/* Круговой текст сверху */}
-            <div className={styles.arcTextTop}>
-              <svg viewBox="0 0 200 200" className={styles.circularTextSvg}>
-                <defs>
-                  <path id="circleTop" d="M 100, 100 m -80, 0 a 80,80 0 1,1 160,0 a 80,80 0 1,1 -160,0" />
-                </defs>
-                <text className={styles.circularText}>
-                  <textPath href="#circleTop" startOffset="0%">
-                    CONGRATS! • CONGRATS! • CONGRATS! • CONGRATS! •
-                  </textPath>
-                </text>
-              </svg>
-            </div>
-            
             <img 
               src={config.giftIcon} 
               alt="Gift" 
               className={styles.giftIcon}
             />
-            
-            {/* Круговой текст снизу */}
-            <div className={styles.arcTextBottom}>
-              <svg viewBox="0 0 200 200" className={styles.circularTextSvg}>
-                <defs>
-                  <path id="circleBottom" d="M 100, 100 m -80, 0 a 80,80 0 1,1 160,0 a 80,80 0 1,1 -160,0" />
-                </defs>
-                <text className={styles.circularText}>
-                  <textPath href="#circleBottom" startOffset="0%">
-                    YOU GOT ACCESS • YOU GOT ACCESS • YOU GOT ACCESS •
-                  </textPath>
-                </text>
-              </svg>
-            </div>
           </div>
           
           {/* Кнопка внутри rewardsBox для кастомных уровней */}
