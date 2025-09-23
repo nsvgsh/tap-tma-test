@@ -166,11 +166,11 @@
   container-type: inline-size; /* allow 100cqw-based CTA height calculation */
 }
 
-/* Maintain CTA aspect ratio: height/width = 55/172 ≈ 0.31977 */
+/* Maintain CTA aspect ratio with stable height calculation */
 .ctaButton { 
   width: 100%;
-  height: clamp(0px, 100cqw * 70 / 172, 70px) !important;
-  font-size: clamp(20px, 22cqw, 25px);
+  height: clamp(50px, 8vw, 70px) !important;
+  font-size: clamp(16px, 4vw, 25px);
   /* Apply Button scaling like Button_buttonBase */
   font-family: 'Lilita One';
   font-weight: 400;
@@ -188,10 +188,12 @@
 @media (max-width: 320px) {
   .ctaButton {
     height: 50px !important;
+    font-size: 16px;
   }
   
   .giftCenter .ctaButton {
     height: 50px !important;
+    font-size: 16px;
   }
   
   .actionLabel {
@@ -229,6 +231,43 @@
   
   .circularText {
     font-size: 14px;
+  }
+}
+
+/* Additional responsive breakpoints for stable button sizing */
+@media (min-width: 321px) and (max-width: 480px) {
+  .ctaButton {
+    height: 55px !important;
+    font-size: 18px;
+  }
+  
+  .giftCenter .ctaButton {
+    height: 55px !important;
+    font-size: 18px;
+  }
+}
+
+@media (min-width: 481px) and (max-width: 768px) {
+  .ctaButton {
+    height: 60px !important;
+    font-size: 20px;
+  }
+  
+  .giftCenter .ctaButton {
+    height: 60px !important;
+    font-size: 20px;
+  }
+}
+
+@media (min-width: 769px) {
+  .ctaButton {
+    height: 70px !important;
+    font-size: 25px;
+  }
+  
+  .giftCenter .ctaButton {
+    height: 70px !important;
+    font-size: 25px;
   }
 }
 
