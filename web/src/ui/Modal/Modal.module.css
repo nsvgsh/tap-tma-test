@@ -187,15 +187,7 @@
   width: 100%;
   height: clamp(0px, 100cqw * 70 / 172, 70px) !important;
   font-size: clamp(20px, 22cqw, 25px);
-  /* Apply Button scaling like Button_buttonBase */
-  font-family: 'Lilita One';
-  font-weight: 400;
-  letter-spacing: -0.025em;
-  color: #ffffff;
-  -webkit-text-stroke: 0.018em #000000;
-  filter: drop-shadow(0 0.07em 0 #000000);
-  line-height: 1;
-  transform: translateY(calc(-1 * 0.12 * 100%));
+  /* Remove duplicate styles - inherit from .ctaButton */
 }
 
 /* Mobile responsiveness for 320px width */

@@ -86,7 +86,7 @@
 
 .rewards {
   position: absolute;
-  top: 0;
+  top: 25px;
   right: 0;
   transform: translate(30%, -30%);
   z-index: 2;

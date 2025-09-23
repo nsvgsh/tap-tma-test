@@ -85,10 +85,10 @@
   text-overflow: ellipsis;
 }
 
-/* Stop font scaling at 420px width and above */
+/* Fix font size at 420px and above to match 419px appearance */
 @media (min-width: 420px) {
   .ctaLabel {
-    font-size: 26px; /* Fixed size at 420px and above */
+    font-size: 20px; /* Fixed size to match 419px appearance */
   }
 }
 
@@ -103,7 +103,7 @@
 
 .rewards {
   position: absolute;
-  top: 0;
+  top: 25px;
   right: 0;
   transform: translate(30%, -30%);
   z-index: 2;
