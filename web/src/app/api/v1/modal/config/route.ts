@@ -65,7 +65,11 @@ export async function GET(request: NextRequest) {
     if (templateError) {
       console.error('Error checking level templates:', templateError);
       return NextResponse.json(
-        { error: 'Failed to check level templates' },
+        { 
+          error: 'Failed to check level templates',
+          details: templateError.message,
+          code: templateError.code
+        },
         { status: 500 }
       );
     }
@@ -85,9 +89,34 @@ export async function GET(request: NextRequest) {
       }))
     });
 
-    // If no templates found for this level, log a warning
+    // If no templates found for this level, try to find any templates (including inactive)
     if (!templates || templates.length === 0) {
-      console.warn(`No active level_reward_templates found for level ${levelNum}. Make sure the level template exists in the database.`);
+      console.warn(`No active level_reward_templates found for level ${levelNum}. Checking all templates...`);
+      
+      const { data: allTemplates, error: allTemplatesError } = await supabase
+        .from('level_reward_templates')
+        .select('integration, level, active, template_id, created_at')
+        .eq('level', levelNum)
+        .order('updated_at', { ascending: false })
+        .limit(10);
+      
+      if (allTemplatesError) {
+        console.error('Error checking all templates:', allTemplatesError);
+        return NextResponse.json(
+          { 
+            error: 'Failed to check level templates',
+            details: allTemplatesError.message,
+            code: allTemplatesError.code
+          },
+          { status: 500 }
+        );
+      }
+      
+      console.log(`All templates for level ${levelNum}:`, allTemplates);
+      
+      if (!allTemplates || allTemplates.length === 0) {
+        console.warn(`No level_reward_templates found for level ${levelNum}. Make sure the level template exists in the database.`);
+      }
     } else {
       // Log all integration values for debugging
       const integrationValues = templates.map(t => t.integration);
