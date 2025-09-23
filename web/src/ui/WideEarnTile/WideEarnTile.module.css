@@ -85,6 +85,13 @@
   text-overflow: ellipsis;
 }
 
+/* Stop font scaling at 420px width and above */
+@media (min-width: 420px) {
+  .ctaLabel {
+    font-size: 26px; /* Fixed size at 420px and above */
+  }
+}
+
 .badge {
   position: absolute;
   top: 0;
@@ -98,7 +105,7 @@
   position: absolute;
   top: 0;
   right: 0;
-  transform: translate(30%, -10%);
+  transform: translate(30%, -30%);
   z-index: 2;
   pointer-events: none;
   display: flex;

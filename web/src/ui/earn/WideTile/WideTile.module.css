@@ -93,7 +93,7 @@
   position: absolute;
   top: 0;
   right: 0;
-  transform: translate(30%, -10%);
+  transform: translate(30%, -30%);
   z-index: 2;
   pointer-events: none;
   display: flex;
