@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
     // Check if this level has integration enabled
     const { data: levelEvents, error: levelError } = await supabase
       .from('level_events')
-      .select('integration')
+      .select('integration, level, created_at')
       .eq('level', levelNum)
       .order('created_at', { ascending: false })
       .limit(10);
@@ -57,8 +57,17 @@ export async function GET(request: NextRequest) {
     console.log(`Level ${levelNum} integration check:`, {
       levelEvents: levelEvents?.length || 0,
       hasIntegration,
-      events: levelEvents?.map(e => ({ integration: e.integration }))
+      events: levelEvents?.map(e => ({ 
+        level: e.level, 
+        integration: e.integration, 
+        created_at: e.created_at 
+      }))
     });
+
+    // If no events found for this level, log a warning
+    if (!levelEvents || levelEvents.length === 0) {
+      console.warn(`No level_events found for level ${levelNum}. Make sure the level exists in the database.`);
+    }
 
     // If integration is enabled for this level, return the custom config
     if (hasIntegration) {
