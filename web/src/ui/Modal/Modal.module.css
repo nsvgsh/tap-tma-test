@@ -19,7 +19,7 @@
   overflow: visible;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
-  padding: 20px 16px 0;
+  padding: 20px 16px 20px;
   border-radius: 20px;
   box-shadow: 0 10px 30px rgba(0,0,0,0.4);
   background: radial-gradient(60% 50% at 50% 40%, #074274 0%, #082D53 60%, #082D53 100%);
@@ -287,8 +287,8 @@
 }
 
 .giftIcon {
-  width: 150px;
-  height: 150px;
+  width: clamp(120px, calc(150px - (420px - 100vw) * 0.3), 150px);
+  height: clamp(120px, calc(150px - (420px - 100vw) * 0.3), 150px);
   object-fit: contain;
 }
 
