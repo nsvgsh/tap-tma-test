@@ -1,6 +1,7 @@
 import React from 'react'
 import styles from './WideEarnTile.module.css'
 import { Badge } from './Badge/Badge'
+import { RewardBadge } from '../earn/RewardBadge/RewardBadge'
 
 export type WideEarnTileProps = {
   id: string
@@ -9,10 +10,36 @@ export type WideEarnTileProps = {
   ctaLabel?: string
   disabled?: boolean
   onClick?: (id: string) => void
+  externalUrl?: string
+  rewardPayload?: Record<string, unknown> | null
 }
 
-export function WideEarnTile({ id, badgeNumber, icon, ctaLabel, disabled, onClick }: WideEarnTileProps) {
+export function WideEarnTile({ id, badgeNumber, icon, ctaLabel, disabled, onClick, externalUrl, rewardPayload }: WideEarnTileProps) {
   const iconSrc = icon === 'target' ? '/ui/earn/Icon_Target.Png' : '/ui/earn/Icon_Chest.Png'
+  
+  // Extract reward values from payload
+  const coins = typeof rewardPayload?.coins === 'number' ? rewardPayload.coins : 0
+  const tickets = typeof rewardPayload?.tickets === 'number' ? rewardPayload.tickets : 0
+  
+  const handleClick = () => {
+    if (externalUrl) {
+      // Open external URL in new tab
+      try {
+        window.open(externalUrl, '_blank', 'noopener,noreferrer')
+      } catch (error) {
+        console.error('Failed to open external link:', error)
+        // Fallback: try to redirect in the same window
+        try {
+          window.location.href = externalUrl
+        } catch (fallbackError) {
+          console.error('Fallback redirect also failed:', fallbackError)
+        }
+      }
+    } else {
+      // Use regular onClick handler
+      onClick?.(id)
+    }
+  }
   
   return (
     <div className={styles.root}>
@@ -25,13 +52,23 @@ export function WideEarnTile({ id, badgeNumber, icon, ctaLabel, disabled, onClic
           className={styles.cta}
           type="button"
           onPointerDown={(e) => { try { e.currentTarget.setAttribute('data-pressed', 'true') } catch {} }}
-          onPointerUp={(e) => { try { e.currentTarget.removeAttribute('data-pressed') } catch {}; onClick?.(id) }}
+          onPointerUp={(e) => { try { e.currentTarget.removeAttribute('data-pressed') } catch {}; handleClick() }}
           onPointerCancel={(e) => { try { e.currentTarget.removeAttribute('data-pressed') } catch {} }}
           onPointerLeave={(e) => { try { e.currentTarget.removeAttribute('data-pressed') } catch {} }}
           disabled={disabled}
         >
           <span className={styles.ctaLabel}>{ctaLabel ?? 'SIGN UP FOR FREE TRIAL'}</span>
         </button>
+        
+        {/* Reward badges */}
+        <div className={styles.rewards}>
+          {coins > 0 && (
+            <RewardBadge value={coins} type="coins" size="small" />
+          )}
+          {tickets > 0 && (
+            <RewardBadge value={tickets} type="tickets" size="small" />
+          )}
+        </div>
       </div>
     </div>
   )

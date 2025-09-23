@@ -45,6 +45,7 @@ export function EarnGrid(props: {
         badgeNumber: it.unlockLevel ?? 1, // Use unlockLevel from database instead of index
         icon: pickIconForTask(it.taskId),
         ctaLabel: 'Open',
+        rewardPayload: it.rewardPayload,
       }))
   }
 
@@ -97,6 +98,7 @@ export function EarnGrid(props: {
               icon="chest"
               ctaLabel="SIGN UP FOR FREE TRIAL"
               externalUrl={generateExternalUrl ? generateExternalUrl() : undefined}
+              rewardPayload={task.rewardPayload}
               onClick={(id) => {
                 if (activeTab === 'available' && !generateExternalUrl) {
                   onWatch?.(id)

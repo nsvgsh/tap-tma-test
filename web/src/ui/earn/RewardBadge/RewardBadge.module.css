@@ -1,0 +1,68 @@
+.badge {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 12px;
+  background: var(--bar-color, #270E0C);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.25);
+  pointer-events: none;
+  z-index: 3;
+}
+
+.badge[data-tone="gold"] {
+  --bar-color: #270E0C;
+}
+
+.badge[data-tone="purple"] {
+  --bar-color: #0B143B;
+}
+
+.icon {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.25));
+}
+
+.value {
+  font-family: 'Lilita One', sans-serif;
+  font-size: 12px;
+  color: #ffffff;
+  line-height: 1;
+  letter-spacing: -0.025em;
+  filter: drop-shadow(0 0.05em 0 #000000);
+  white-space: nowrap;
+}
+
+/* Size variants */
+.badge.small {
+  gap: 3px;
+  padding: 3px 6px;
+  border-radius: 10px;
+}
+
+.badge.small .icon {
+  width: 14px;
+  height: 14px;
+}
+
+.badge.small .value {
+  font-size: 10px;
+}
+
+.badge.medium {
+  gap: 5px;
+  padding: 5px 10px;
+  border-radius: 14px;
+}
+
+.badge.medium .icon {
+  width: 18px;
+  height: 18px;
+}
+
+.badge.medium .value {
+  font-size: 14px;
+}

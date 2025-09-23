@@ -1,6 +1,7 @@
 import React from 'react'
 import styles from './WideTile.module.css'
 import { Badge } from '../Badge/Badge'
+import { RewardBadge } from '../RewardBadge/RewardBadge'
 
 export type WideTileProps = {
   id: string
@@ -10,10 +11,15 @@ export type WideTileProps = {
   disabled?: boolean
   onClick?: (id: string) => void
   externalUrl?: string
+  rewardPayload?: Record<string, unknown> | null
 }
 
-export function WideTile({ id, badgeNumber, icon, ctaLabel, disabled, onClick, externalUrl }: WideTileProps) {
+export function WideTile({ id, badgeNumber, icon, ctaLabel, disabled, onClick, externalUrl, rewardPayload }: WideTileProps) {
   const iconSrc = icon === 'target' ? '/ui/earn/Icon_Target.Png' : '/ui/earn/Icon_Chest.Png'
+  
+  // Extract reward values from payload
+  const coins = typeof rewardPayload?.coins === 'number' ? rewardPayload.coins : 0
+  const tickets = typeof rewardPayload?.tickets === 'number' ? rewardPayload.tickets : 0
   
   const handleClick = () => {
     if (externalUrl) {
@@ -53,6 +59,16 @@ export function WideTile({ id, badgeNumber, icon, ctaLabel, disabled, onClick, e
         >
           <span className={styles.ctaLabel}>{ctaLabel ?? 'SIGN UP FOR FREE TRIAL'}</span>
         </button>
+        
+        {/* Reward badges */}
+        <div className={styles.rewards}>
+          {coins > 0 && (
+            <RewardBadge value={coins} type="coins" size="small" />
+          )}
+          {tickets > 0 && (
+            <RewardBadge value={tickets} type="tickets" size="small" />
+          )}
+        </div>
       </div>
     </div>
   )
