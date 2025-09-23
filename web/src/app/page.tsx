@@ -125,7 +125,14 @@ export default function Home() {
           const data = (await claimRes.json()) as Session
           setSession(data)
           if (typeof window !== 'undefined') window.localStorage.setItem('session', JSON.stringify(data))
-          setClientSeq(Number(data.lastAppliedSeq || 0))
+          const newClientSeq = Number(data.lastAppliedSeq || 0)
+          setClientSeq(newClientSeq)
+          // Reset tapBatcher with correct clientSeq if it exists
+          if (tapBatcher) {
+            tapBatcher.reset(newClientSeq)
+          }
+          // Reset batcher initialization flag to ensure it's recreated with correct clientSeq
+          setTapBatcherInitialized(false)
           await loadCounters()
           return
         }
@@ -139,8 +146,15 @@ export default function Home() {
     if (!res.ok) return
     const data = (await res.json()) as Session
     setSession(data)
-    setClientSeq(0)
+    const newClientSeq = 0
+    setClientSeq(newClientSeq)
     if (typeof window !== 'undefined') window.localStorage.setItem('session', JSON.stringify(data))
+    // Reset tapBatcher with correct clientSeq if it exists
+    if (tapBatcher) {
+      tapBatcher.reset(newClientSeq)
+    }
+    // Reset batcher initialization flag to ensure it's recreated with correct clientSeq
+    setTapBatcherInitialized(false)
     await loadCounters()
   }
 
@@ -180,7 +194,14 @@ export default function Home() {
       }),
     }, {
       retry429DelayMs: batchMinIntervalMs,
-      onOutdated: async () => { await resumeOrStartSession() },
+      onOutdated: async () => { 
+        // Refresh session and reset batcher on 409 errors
+        await resumeOrStartSession()
+        // Clear any pending taps that might be invalid after session refresh
+        if (tapBatcher) {
+          tapBatcher.reset(clientSeq)
+        }
+      },
     })
     
     if (ok) {
@@ -198,20 +219,39 @@ export default function Home() {
       }
       setNextThreshold(data?.nextThreshold ?? null)
     } else {
+      // Handle specific error codes
+      const errorData = json as { code?: string; error?: string }
+      if (errorData?.code === 'SUPERSEDED' || errorData?.code === 'SEQ_REWIND') {
+        // Session is out of sync, refresh and retry
+        try { console.log(JSON.stringify({ event: 'SessionOutOfSync', code: errorData.code, clientSeq: lastTap.clientSeq })) } catch {}
+        await resumeOrStartSession()
+        if (tapBatcher) {
+          tapBatcher.reset(clientSeq)
+        }
+        return
+      }
+      
       try {
-        const errText = typeof (json as { error?: unknown })?.error === 'string' ? (json as { error?: string }).error! : 'Something went wrong. Please try again.'
+        const errText = typeof errorData?.error === 'string' ? errorData.error : 'Something went wrong. Please try again.'
         showNotice(errText)
       } catch {
         showNotice('Something went wrong. Please try again.')
       }
     }
-  }, [session, batchMinIntervalMs])
+  }, [session, batchMinIntervalMs, clientSeq, tapBatcher])
 
   // New tap function using batching
   function tap() {
     if (!session || !tapBatcher) {
-        return
-      }
+      return
+    }
+    
+    // Validate session before adding tap
+    if (!session.sessionId || !session.sessionEpoch) {
+      try { console.log(JSON.stringify({ event: 'InvalidSessionForTap', sessionId: session.sessionId, sessionEpoch: session.sessionEpoch })) } catch {}
+      return
+    }
+    
     tapBatcher.addTap(session.sessionId, session.sessionEpoch)
     
     // Track taps for EARN notification dismissal
@@ -539,11 +579,13 @@ export default function Home() {
         maxBatchDelayMs: 200, // Or after 200ms delay
         batchMinIntervalMs: batchMinIntervalMs
       }
-        const batcher = new TapBatcher(batchConfig, processTapBatch, handleInstantTapFeedback, clientSeq)
-        setTapBatcher(batcher)
-        setTapBatcherInitialized(true)
+      // Use the current clientSeq from state, which should be properly synchronized
+      const batcher = new TapBatcher(batchConfig, processTapBatch, handleInstantTapFeedback, clientSeq)
+      setTapBatcher(batcher)
+      setTapBatcherInitialized(true)
+      try { console.log(JSON.stringify({ event: 'TapBatcherInitialized', clientSeq, sessionId: session.sessionId })) } catch {}
     }
-  }, [session, processTapBatch, handleInstantTapFeedback, tapBatcherInitialized, batchMinIntervalMs]) // Removed clientSeq from dependencies
+  }, [session, processTapBatch, handleInstantTapFeedback, tapBatcherInitialized, batchMinIntervalMs, clientSeq])
 
   // Wallet: hydrate address from sessionStorage
   useEffect(() => {

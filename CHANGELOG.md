@@ -63,3 +63,4 @@
 | MONETAG-TASK-LOGIC-001 | Modified postback endpoint to handle closed/failed events separately |
 | MONETAG-TASK-LOGIC-002 | Updated tasks API to check only closed Monetag events |
 | MONETAG-TASK-LOGIC-003 | Added periodic task refresh in EARN section for postback tracking |
+| TAP-BATCHING-0001 | Fixed race condition in first tap request causing 409 Conflict errors |

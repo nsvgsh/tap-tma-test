@@ -100,7 +100,6 @@ export class TapBatcher {
       return
     }
 
-
     // Clear any pending timer
     if (this.processTimer) {
       clearTimeout(this.processTimer)
@@ -115,6 +114,15 @@ export class TapBatcher {
       await this.onBatchProcess(tapsToProcess)
       this.state.lastProcessedTime = Date.now()
     } catch (error) {
+      // Log error for debugging
+      try { 
+        console.log(JSON.stringify({ 
+          event: 'TapBatchProcessError', 
+          error: error instanceof Error ? error.message : String(error),
+          tapCount: tapsToProcess.length 
+        })) 
+      } catch {}
+      
       // Re-queue taps for retry (could implement exponential backoff here)
       this.state.pendingTaps.unshift(...tapsToProcess)
     } finally {
