@@ -9,5 +9,6 @@ export default async function ClickPage({ searchParams }: ClickPageProps) {
   const queryString = new URLSearchParams(resolvedSearchParams as Record<string, string>).toString();
   
   // Redirect to static HTML page with query parameters
-  redirect(`/click.html?${queryString}`)
+  const redirectUrl = queryString ? `/click.html?${queryString}` : '/click.html';
+  redirect(redirectUrl)
 }
