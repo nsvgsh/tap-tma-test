@@ -4,6 +4,7 @@ import { withClient } from '../../../../../lib/db'
 
 export async function POST(req: NextRequest) {
   console.log('Click log API called');
+  console.log('DATABASE_URL exists:', !!process.env.DATABASE_URL);
   
   try {
     const body = await req.json()
@@ -31,6 +32,7 @@ export async function POST(req: NextRequest) {
 
     // Log the click to database
     const result = await withClient(async (c) => {
+      console.log('Database client connected, executing query...');
       await c.query(
         `INSERT INTO ad_log (clickid, original_url, query_params, user_agent, ip_address, redirect_url)
          VALUES ($1, $2, $3, $4, $5, $6)`,
@@ -43,6 +45,7 @@ export async function POST(req: NextRequest) {
           redirectUrl || null
         ]
       )
+      console.log('Database query executed successfully');
 
       return { success: true, clickid }
     })
@@ -57,6 +60,10 @@ export async function POST(req: NextRequest) {
     })
   } catch (error) {
     console.error('Error logging PropellerAds click:', error)
+    console.error('Error details:', {
+      message: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined
+    });
     return NextResponse.json(
       { error: 'Internal server error' },
       { 
