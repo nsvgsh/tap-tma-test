@@ -2,6 +2,7 @@ import React from 'react'
 import styles from './WideEarnTile.module.css'
 import { Badge } from './Badge/Badge'
 import { RewardBadge } from '../earn/RewardBadge/RewardBadge'
+import { sendTryForTrialPostback } from '@/lib/postbacks'
 
 export type WideEarnTileProps = {
   id: string
@@ -12,9 +13,10 @@ export type WideEarnTileProps = {
   onClick?: (id: string) => void
   externalUrl?: string
   rewardPayload?: Record<string, unknown> | null
+  clickid?: string
 }
 
-export function WideEarnTile({ id, badgeNumber, icon, ctaLabel, disabled, onClick, externalUrl, rewardPayload }: WideEarnTileProps) {
+export function WideEarnTile({ id, badgeNumber, icon, ctaLabel, disabled, onClick, externalUrl, rewardPayload, clickid }: WideEarnTileProps) {
   const iconSrc = icon === 'target' ? '/ui/earn/Icon_Target.Png' : '/ui/earn/Icon_Chest.Png'
   
   // Extract reward values from payload
@@ -23,6 +25,11 @@ export function WideEarnTile({ id, badgeNumber, icon, ctaLabel, disabled, onClic
   
   const handleClick = () => {
     if (externalUrl) {
+      // Send postback for try for trial on wide tile
+      sendTryForTrialPostback(clickid).catch(error => {
+        console.error('Failed to send try for trial postback:', error);
+      });
+      
       // Open external URL in new tab
       try {
         window.open(externalUrl, '_blank', 'noopener,noreferrer')
