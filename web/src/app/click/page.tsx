@@ -1,9 +1,9 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 
-export default function ClickPage() {
+function ClickPageContent() {
   const searchParams = useSearchParams()
   
   useEffect(() => {
@@ -57,5 +57,25 @@ export default function ClickPage() {
       <h1>Redirecting...</h1>
       <p>Please wait while we redirect you to the app.</p>
     </div>
+  )
+}
+
+export default function ClickPage() {
+  return (
+    <Suspense fallback={
+      <div style={{ 
+        display: 'flex', 
+        flexDirection: 'column', 
+        alignItems: 'center', 
+        justifyContent: 'center', 
+        height: '100vh',
+        fontFamily: 'system-ui, sans-serif'
+      }}>
+        <h1>Loading...</h1>
+        <p>Please wait...</p>
+      </div>
+    }>
+      <ClickPageContent />
+    </Suspense>
   )
 }
