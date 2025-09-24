@@ -2,12 +2,13 @@ import { redirect } from 'next/navigation';
 import { headers } from 'next/headers';
 
 interface ClickPageProps {
-  searchParams: { [key: string]: string | string[] | undefined };
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
 export default async function ClickPage({ searchParams }: ClickPageProps) {
+  const resolvedSearchParams = await searchParams;
   // Extract clickid and other parameters
-  const clickid = searchParams.clickid as string;
+  const clickid = resolvedSearchParams.clickid as string;
   
   if (!clickid) {
     // If no clickid, redirect to main app
@@ -23,7 +24,7 @@ export default async function ClickPage({ searchParams }: ClickPageProps) {
 
   // Prepare query parameters for logging
   const queryParams: Record<string, string | string[] | undefined> = {};
-  Object.entries(searchParams).forEach(([key, value]) => {
+  Object.entries(resolvedSearchParams).forEach(([key, value]) => {
     queryParams[key] = value;
   });
 
@@ -34,7 +35,7 @@ export default async function ClickPage({ searchParams }: ClickPageProps) {
     // Log the click to database
     await logClick({
       clickid,
-      originalUrl: `https://tap-tma-test.vercel.app/click?${new URLSearchParams(searchParams as Record<string, string>).toString()}`,
+      originalUrl: `https://tap-tma-test.vercel.app/click?${new URLSearchParams(resolvedSearchParams as Record<string, string>).toString()}`,
       queryParams,
       userAgent,
       ipAddress,
