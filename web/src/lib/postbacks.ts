@@ -8,6 +8,7 @@
  */
 export async function trackUserClickid(clickid: string): Promise<string | null> {
   try {
+    console.log('trackUserClickid: Attempting to track clickid:', clickid)
     const response = await fetch('/api/v1/user/click-tracking', {
       method: 'POST',
       headers: {
@@ -16,12 +17,15 @@ export async function trackUserClickid(clickid: string): Promise<string | null> 
       body: JSON.stringify({ clickid }),
     })
 
+    console.log('trackUserClickid: Response status:', response.status)
     if (!response.ok) {
-      console.error('Failed to track user clickid:', response.status)
+      const errorText = await response.text()
+      console.error('Failed to track user clickid:', response.status, errorText)
       return null
     }
 
     const result = await response.json()
+    console.log('trackUserClickid: Response data:', result)
     return result.success ? result.clickid : null
   } catch (error) {
     console.error('Error tracking user clickid:', error)
@@ -34,15 +38,20 @@ export async function trackUserClickid(clickid: string): Promise<string | null> 
  */
 export async function getUserClickid(): Promise<string | null> {
   try {
+    console.log('getUserClickid: Attempting to get user clickid...')
     const response = await fetch('/api/v1/user/click-tracking', {
       method: 'GET',
     })
 
+    console.log('getUserClickid: Response status:', response.status)
     if (!response.ok) {
+      const errorText = await response.text()
+      console.log('getUserClickid: Error response:', errorText)
       return null
     }
 
     const result = await response.json()
+    console.log('getUserClickid: Response data:', result)
     return result.success ? result.clickid : null
   } catch (error) {
     console.error('Error getting user clickid:', error)
