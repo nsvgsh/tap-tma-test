@@ -33,6 +33,17 @@ export async function POST(req: NextRequest) {
     // Log the click to database
     const result = await withClient(async (c) => {
       console.log('Database client connected, executing query...');
+      
+      // Validate IP address - only use if it's a valid IP, otherwise use null
+      let validIpAddress = null;
+      if (ipAddress && ipAddress !== 'unknown') {
+        // Basic IP validation
+        const ipRegex = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+        if (ipRegex.test(ipAddress)) {
+          validIpAddress = ipAddress;
+        }
+      }
+      
       await c.query(
         `INSERT INTO ad_log (clickid, original_url, query_params, user_agent, ip_address, redirect_url)
          VALUES ($1, $2, $3, $4, $5, $6)`,
@@ -41,7 +52,7 @@ export async function POST(req: NextRequest) {
           originalUrl,
           JSON.stringify(queryParams),
           userAgent || null,
-          ipAddress || null,
+          validIpAddress,
           redirectUrl || null
         ]
       )
