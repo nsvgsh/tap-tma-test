@@ -58,7 +58,8 @@ async function logClick(data: {
   ipAddress: string;
   redirectUrl: string;
 }) {
-  const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/v1/ad/click-log`, {
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.VERCEL_URL || 'http://localhost:3000'
+  const response = await fetch(`${baseUrl}/api/v1/ad/click-log`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
