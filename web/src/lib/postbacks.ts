@@ -95,7 +95,7 @@ export async function sendPostback(
 ): Promise<PostbackResult> {
   try {
     // If no clickid provided, try to get user's associated clickid
-    let finalClickid = clickid
+    let finalClickid: string | null | undefined = clickid
     if (!finalClickid) {
       finalClickid = await getUserClickid()
     }
