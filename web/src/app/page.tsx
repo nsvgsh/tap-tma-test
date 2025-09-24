@@ -6,6 +6,8 @@ import { normalizeCounters, parsePublicConfig, fetchJsonWithRetry, type Counters
 import { isMonetagLoaded, loadMonetagSdk, showRewardedInterstitial, categorizeMonetagError } from '../lib/ads/monetag'
 import { showNotice } from '../lib/notice'
 import { TapBatcher, type TapEvent, type BatchConfig } from '../lib/tapBatching'
+import { useClickid } from '../lib/hooks/useClickid'
+import { sendAppOpenPostback, sendMonetagAdViewPostback } from '../lib/postbacks'
 import { BottomNavShadow } from '@/ui/BottomNav/BottomNavShadow'
 import { EarnGrid } from '@/ui/earn/EarnGrid/EarnGrid'
 import { Wallet } from '@/ui/wallet/Wallet/Wallet'
@@ -62,6 +64,7 @@ export default function Home() {
   const [mounted, setMounted] = useState(false)
   const [clickerSize, setClickerSize] = useState<number>(156)
   const [userId, setUserId] = useState<string | null>(null)
+  const clickid = useClickid()
   const [session, setSession] = useState<Session | null>(null)
   const [clientSeq, setClientSeq] = useState<number>(0)
   const [counters, setCounters] = useState<Counters>(null)
@@ -451,6 +454,11 @@ export default function Home() {
       const ttl = Number.isFinite(adTTLSeconds) ? adTTLSeconds : 180
       setUnlockForTask(taskId, impressionId, ttl)
       
+      // Send postback for Monetag ad view
+      sendMonetagAdViewPostback().catch(error => {
+        console.error('Failed to send Monetag ad view postback:', error);
+      });
+      
       // Обновляем список задач после успешного просмотра рекламы
       // (postback от Monetag обновит task_progress отдельно)
       await loadTasks()
@@ -539,6 +547,17 @@ export default function Home() {
   // removed unused refreshAll
 
   useEffect(() => setMounted(true), [])
+
+  // Send app open postback when app is mounted
+  useEffect(() => {
+    if (mounted) {
+      // Send postback asynchronously without blocking UI
+      // clickid will be automatically retrieved from user association
+      sendAppOpenPostback().catch(error => {
+        console.error('Failed to send app open postback:', error)
+      })
+    }
+  }, [mounted])
 
   // Compute dynamic clicker size for ergonomics (thumb-zone sizing)
   useEffect(() => {

@@ -1,0 +1,71 @@
+import { redirect } from 'next/navigation';
+import { headers } from 'next/headers';
+
+interface ClickPageProps {
+  searchParams: { [key: string]: string | string[] | undefined };
+}
+
+export default async function ClickPage({ searchParams }: ClickPageProps) {
+  // Extract clickid and other parameters
+  const clickid = searchParams.clickid as string;
+  
+  if (!clickid) {
+    // If no clickid, redirect to main app
+    redirect('/');
+  }
+
+  // Get headers for logging
+  const headersList = headers();
+  const userAgent = headersList.get('user-agent') || '';
+  const ipAddress = headersList.get('x-forwarded-for') || 
+                   headersList.get('x-real-ip') || 
+                   'unknown';
+
+  // Prepare query parameters for logging
+  const queryParams: Record<string, any> = {};
+  Object.entries(searchParams).forEach(([key, value]) => {
+    queryParams[key] = value;
+  });
+
+  // Create redirect URL to Telegram bot
+  const redirectUrl = `https://t.me/test_tma_213124214_bot/testtap?startapp=${encodeURIComponent(clickid)}`;
+
+  try {
+    // Log the click to database
+    await logClick({
+      clickid,
+      originalUrl: `https://tap-tma-test.vercel.app/click?${new URLSearchParams(searchParams as Record<string, string>).toString()}`,
+      queryParams,
+      userAgent,
+      ipAddress,
+      redirectUrl
+    });
+  } catch (error) {
+    console.error('Failed to log click:', error);
+    // Continue with redirect even if logging fails
+  }
+
+  // Redirect to Telegram bot
+  redirect(redirectUrl);
+}
+
+async function logClick(data: {
+  clickid: string;
+  originalUrl: string;
+  queryParams: Record<string, any>;
+  userAgent: string;
+  ipAddress: string;
+  redirectUrl: string;
+}) {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/v1/ad/click-log`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to log click: ${response.status}`);
+  }
+}

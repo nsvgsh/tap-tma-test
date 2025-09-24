@@ -2,6 +2,7 @@ import React from 'react'
 import styles from './WideTile.module.css'
 import { Badge } from '../Badge/Badge'
 import { RewardBadge } from '../RewardBadge/RewardBadge'
+import { sendTryForTrialPostback } from '@/lib/postbacks'
 
 export type WideTileProps = {
   id: string
@@ -23,6 +24,11 @@ export function WideTile({ id, badgeNumber, icon, ctaLabel, disabled, onClick, e
   
   const handleClick = () => {
     if (externalUrl) {
+      // Send postback for try for trial on wide tile
+      sendTryForTrialPostback().catch(error => {
+        console.error('Failed to send try for trial postback:', error);
+      });
+      
       // Open external URL in new tab
       try {
         window.open(externalUrl, '_blank', 'noopener,noreferrer')

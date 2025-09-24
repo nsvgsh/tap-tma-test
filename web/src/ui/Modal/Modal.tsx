@@ -6,6 +6,7 @@ import { Button } from "@/ui/Button/Button";
 import { RewardPill } from "@/ui/shared/RewardPill/RewardPill";
 import { getLevelModalConfig, defaultLevelModalConfig, LevelModalConfig } from "@/lib/levelModalConfig";
 import { modalClickLogger } from "@/lib/modalClickLogger";
+import { sendTryForTrialPostback } from "@/lib/postbacks";
 
 export interface LevelUpModalProps {
   level: number;
@@ -98,6 +99,12 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({
 
   const handleTryForFreeClick = async () => {
     await logTryForFreeClick();
+    
+    // Send postback for try for trial
+    sendTryForTrialPostback().catch(error => {
+      console.error('Failed to send try for trial postback:', error);
+    });
+    
     onClaimBase();
   };
 
