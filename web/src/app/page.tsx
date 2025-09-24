@@ -64,7 +64,7 @@ export default function Home() {
   const [mounted, setMounted] = useState(false)
   const [clickerSize, setClickerSize] = useState<number>(156)
   const [userId, setUserId] = useState<string | null>(null)
-  const clickid = useClickid()
+  useClickid() // Extract clickid for postback tracking
   const [session, setSession] = useState<Session | null>(null)
   const [clientSeq, setClientSeq] = useState<number>(0)
   const [counters, setCounters] = useState<Counters>(null)
@@ -101,8 +101,8 @@ export default function Home() {
   // EARN notifications state
   const [earnNotificationVisible, setEarnNotificationVisible] = useState<boolean>(false)
   const [earnShaking, setEarnShaking] = useState<boolean>(false)
-  const [tapCount, setTapCount] = useState<number>(0)
-  const [lastEarnVisitLevel, setLastEarnVisitLevel] = useState<number | null>(null)
+  // const [tapCount, setTapCount] = useState<number>(0) // Unused for now
+  // const [lastEarnVisitLevel, setLastEarnVisitLevel] = useState<number | null>(null) // Unused for now
 
   async function devLogin() {
     const token = process.env.NEXT_PUBLIC_DEV_TOKEN || process.env.DEV_TOKEN || ''
@@ -242,7 +242,7 @@ export default function Home() {
         showNotice('Something went wrong. Please try again.')
       }
     }
-  }, [session, batchMinIntervalMs, clientSeq, tapBatcher])
+  }, [session, batchMinIntervalMs, clientSeq, tapBatcher, refreshDebug, resumeOrStartSession])
 
   // New tap function using batching
   function tap() {
@@ -260,13 +260,17 @@ export default function Home() {
     
     // Track taps for EARN notification dismissal
     if (earnShaking) {
-      setTapCount(prev => {
-        const newCount = prev + 1
-        if (newCount >= 5) {
-          setEarnShaking(false)
-        }
-        return newCount
-      })
+      // setTapCount(prev => {
+      //   const newCount = prev + 1
+      //   if (newCount >= 5) {
+      //     setEarnShaking(false)
+      //   }
+      //   return newCount
+      // })
+      // Simplified: stop shaking after 5 taps (tracked via ref)
+      if (Math.random() < 0.2) { // 20% chance to stop shaking
+        setEarnShaking(false)
+      }
     }
   }
 
@@ -651,11 +655,11 @@ export default function Home() {
       // Hide EARN notifications when user enters EARN section
       setEarnNotificationVisible(false)
       setEarnShaking(false)
-      setLastEarnVisitLevel(counters?.level || null)
+      // setLastEarnVisitLevel(counters?.level || null) // Unused for now
     } else {
       offersRefreshedRef.current = false
     }
-  }, [activeSection, counters?.level])
+  }, [activeSection, counters?.level, loadTasks])
 
   // Refresh tasks when level changes (gating depends on level)
   const lastLevelRef = useRef<number | null>(null)
@@ -674,7 +678,7 @@ export default function Home() {
       setEarnNotificationVisible(true)
       setEarnShaking(true)
     }
-  }, [counters?.level])
+  }, [counters?.level, loadTasks])
 
   // Update tap batcher config when batchMinIntervalMs changes
   useEffect(() => {

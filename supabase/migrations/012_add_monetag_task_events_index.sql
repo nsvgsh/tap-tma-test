@@ -9,3 +9,4 @@ CREATE INDEX IF NOT EXISTS idx_ad_events_monetag_postback
 ON ad_events(user_id, provider, placement, status, created_at) 
 WHERE provider = 'monetag' AND placement = 'task_claim';
 
+

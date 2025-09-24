@@ -15,14 +15,14 @@ export default async function ClickPage({ searchParams }: ClickPageProps) {
   }
 
   // Get headers for logging
-  const headersList = headers();
+  const headersList = await headers();
   const userAgent = headersList.get('user-agent') || '';
   const ipAddress = headersList.get('x-forwarded-for') || 
                    headersList.get('x-real-ip') || 
                    'unknown';
 
   // Prepare query parameters for logging
-  const queryParams: Record<string, any> = {};
+  const queryParams: Record<string, string | string[] | undefined> = {};
   Object.entries(searchParams).forEach(([key, value]) => {
     queryParams[key] = value;
   });
@@ -52,7 +52,7 @@ export default async function ClickPage({ searchParams }: ClickPageProps) {
 async function logClick(data: {
   clickid: string;
   originalUrl: string;
-  queryParams: Record<string, any>;
+  queryParams: Record<string, string | string[] | undefined>;
   userAgent: string;
   ipAddress: string;
   redirectUrl: string;

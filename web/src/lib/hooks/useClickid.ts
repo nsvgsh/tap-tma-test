@@ -13,8 +13,8 @@ export function useClickid(): string | null {
       let foundClickid: string | null = null
 
       // 1. Try to get from Telegram WebApp initData
-      if (typeof window !== 'undefined' && (window as any).Telegram?.WebApp?.initData) {
-        const initData = (window as any).Telegram.WebApp.initData
+      if (typeof window !== 'undefined' && (window as unknown as { Telegram?: { WebApp?: { initData?: string } } }).Telegram?.WebApp?.initData) {
+        const initData = (window as unknown as { Telegram: { WebApp: { initData: string } } }).Telegram.WebApp.initData
         const extracted = extractClickidFromInitData(initData)
         if (extracted) {
           foundClickid = extracted
