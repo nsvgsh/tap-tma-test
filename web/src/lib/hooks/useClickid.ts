@@ -14,13 +14,22 @@ export function useClickid(): string | null {
       let foundClickid: string | null = null
 
       // 1. Try to get from Telegram WebApp initData
-      if (typeof window !== 'undefined' && (window as unknown as { Telegram?: { WebApp?: { initData?: string } } }).Telegram?.WebApp?.initData) {
-        const initData = (window as unknown as { Telegram: { WebApp: { initData: string } } }).Telegram.WebApp.initData
-        console.log('useClickid: Found Telegram initData:', initData)
-        const extracted = extractClickidFromInitData(initData)
-        if (extracted) {
-          foundClickid = extracted
-          console.log('useClickid: Extracted clickid from initData:', extracted)
+      if (typeof window !== 'undefined') {
+        const telegram = (window as unknown as { Telegram?: { WebApp?: { initData?: string } } }).Telegram
+        console.log('useClickid: Telegram object:', telegram)
+        
+        if (telegram?.WebApp?.initData) {
+          const initData = telegram.WebApp.initData
+          console.log('useClickid: Found Telegram initData:', initData)
+          const extracted = extractClickidFromInitData(initData)
+          if (extracted) {
+            foundClickid = extracted
+            console.log('useClickid: Extracted clickid from initData:', extracted)
+          } else {
+            console.log('useClickid: No clickid found in initData')
+          }
+        } else {
+          console.log('useClickid: No Telegram initData found')
         }
       }
 
@@ -31,6 +40,35 @@ export function useClickid(): string | null {
         if (urlClickid) {
           foundClickid = urlClickid
           console.log('useClickid: Found clickid in URL:', urlClickid)
+        }
+      }
+
+      // 2.5. Try to get from URL hash (Telegram WebApp)
+      if (!foundClickid) {
+        const hash = window.location.hash
+        console.log('useClickid: URL hash:', hash)
+        
+        // Look for tgWebAppStartParam in hash
+        const startParamMatch = hash.match(/[?&]tgWebAppStartParam=([^&]+)/)
+        if (startParamMatch) {
+          foundClickid = startParamMatch[1]
+          console.log('useClickid: Found clickid in URL hash startParam:', foundClickid)
+        }
+        
+        // Also try to extract from tgWebAppData
+        const tgWebAppDataMatch = hash.match(/[?&]tgWebAppData=([^&]+)/)
+        if (tgWebAppDataMatch && !foundClickid) {
+          try {
+            const decodedData = decodeURIComponent(tgWebAppDataMatch[1])
+            console.log('useClickid: Decoded tgWebAppData:', decodedData)
+            const extracted = extractClickidFromInitData(decodedData)
+            if (extracted) {
+              foundClickid = extracted
+              console.log('useClickid: Extracted clickid from tgWebAppData:', extracted)
+            }
+          } catch (error) {
+            console.log('useClickid: Error decoding tgWebAppData:', error)
+          }
         }
       }
 
