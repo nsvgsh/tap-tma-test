@@ -1,4 +1,4 @@
-import { redirect } from 'next/navigation';
+import { NextResponse } from 'next/server';
 import { headers } from 'next/headers';
 
 interface ClickPageProps {
@@ -12,7 +12,7 @@ export default async function ClickPage({ searchParams }: ClickPageProps) {
   
   if (!clickid) {
     // If no clickid, redirect to main app
-    redirect('/');
+    return NextResponse.redirect(new URL('/', process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'));
   }
 
   // Get headers for logging
@@ -47,7 +47,7 @@ export default async function ClickPage({ searchParams }: ClickPageProps) {
   }
 
   // Redirect to Telegram bot
-  redirect(redirectUrl);
+  return NextResponse.redirect(redirectUrl);
 }
 
 async function logClick(data: {
