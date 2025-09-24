@@ -3,8 +3,11 @@ import { NextRequest, NextResponse } from 'next/server'
 import { withClient } from '../../../../../lib/db'
 
 export async function POST(req: NextRequest) {
+  console.log('Click log API called');
+  
   try {
     const body = await req.json()
+    console.log('Request body:', body);
     
     const {
       clickid,
@@ -17,11 +20,14 @@ export async function POST(req: NextRequest) {
 
     // Validate required fields
     if (!clickid || !originalUrl || !queryParams) {
+      console.log('Missing required fields:', { clickid, originalUrl, queryParams });
       return NextResponse.json(
         { error: 'Missing required fields: clickid, originalUrl, queryParams' },
         { status: 400 }
       )
     }
+
+    console.log('Logging click to database:', clickid);
 
     // Log the click to database
     const result = await withClient(async (c) => {
@@ -41,12 +47,37 @@ export async function POST(req: NextRequest) {
       return { success: true, clickid }
     })
 
-    return NextResponse.json(result)
+    console.log('Click logged successfully:', result);
+    return NextResponse.json(result, {
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type',
+      }
+    })
   } catch (error) {
     console.error('Error logging PropellerAds click:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
-      { status: 500 }
+      { 
+        status: 500,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'POST, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type',
+        }
+      }
     )
   }
+}
+
+export async function OPTIONS(req: NextRequest) {
+  return new NextResponse(null, {
+    status: 200,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type',
+    }
+  })
 }

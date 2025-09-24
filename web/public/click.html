@@ -41,14 +41,22 @@
     
     <script>
         (function() {
+            console.log('Click page script started');
+            
             const urlParams = new URLSearchParams(window.location.search);
             const clickid = urlParams.get('clickid');
             
+            console.log('URL params:', window.location.search);
+            console.log('Clickid:', clickid);
+            
             if (!clickid) {
+                console.log('No clickid found, redirecting to home');
                 window.location.href = '/';
                 return;
             }
 
+            console.log('Starting click logging...');
+            
             // Log the click
             fetch('/api/v1/ad/click-log', {
                 method: 'POST',
@@ -64,19 +72,31 @@
                     redirectUrl: 'https://t.me/test_tma_213124214_bot/testtap?startapp=' + encodeURIComponent(clickid)
                 }),
             }).then(response => {
+                console.log('Fetch response status:', response.status);
                 if (response.ok) {
                     console.log('Click logged successfully');
+                    return response.json();
                 } else {
                     console.error('Failed to log click:', response.status);
+                    return response.text().then(text => {
+                        console.error('Error response:', text);
+                    });
+                }
+            }).then(data => {
+                if (data) {
+                    console.log('Response data:', data);
                 }
             }).catch(error => {
                 console.error('Failed to log click:', error);
             });
 
             // Redirect to Telegram bot
+            console.log('Setting up redirect...');
             setTimeout(() => {
-                window.location.href = 'https://t.me/test_tma_213124214_bot/testtap?startapp=' + encodeURIComponent(clickid);
-            }, 1000);
+                const redirectUrl = 'https://t.me/test_tma_213124214_bot/testtap?startapp=' + encodeURIComponent(clickid);
+                console.log('Redirecting to:', redirectUrl);
+                window.location.href = redirectUrl;
+            }, 2000);
         })();
     </script>
 </body>
