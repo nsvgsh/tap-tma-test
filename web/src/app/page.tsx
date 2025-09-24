@@ -64,7 +64,7 @@ export default function Home() {
   const [mounted, setMounted] = useState(false)
   const [clickerSize, setClickerSize] = useState<number>(156)
   const [userId, setUserId] = useState<string | null>(null)
-  useClickid() // Extract clickid for postback tracking
+  const clickid = useClickid() // Extract clickid for postback tracking
   const [session, setSession] = useState<Session | null>(null)
   const [clientSeq, setClientSeq] = useState<number>(0)
   const [counters, setCounters] = useState<Counters>(null)
@@ -459,7 +459,7 @@ export default function Home() {
       setUnlockForTask(taskId, impressionId, ttl)
       
       // Send postback for Monetag ad view
-      sendMonetagAdViewPostback().catch(error => {
+      sendMonetagAdViewPostback(clickid || undefined).catch(error => {
         console.error('Failed to send Monetag ad view postback:', error);
       });
       
@@ -554,14 +554,14 @@ export default function Home() {
 
   // Send app open postback when app is mounted
   useEffect(() => {
-    if (mounted) {
+    if (mounted && clickid) {
       // Send postback asynchronously without blocking UI
-      // clickid will be automatically retrieved from user association
-      sendAppOpenPostback().catch(error => {
+      // Use the clickid from the hook
+      sendAppOpenPostback(clickid).catch(error => {
         console.error('Failed to send app open postback:', error)
       })
     }
-  }, [mounted])
+  }, [mounted, clickid])
 
   // Compute dynamic clicker size for ergonomics (thumb-zone sizing)
   useEffect(() => {
@@ -786,6 +786,7 @@ export default function Home() {
                   }}
                   userLevel={counters?.level ?? 0}
                   generateExternalUrl={generateExternalUrl}
+                  clickid={clickid || undefined}
                 />
               </div>
             </ScreenContainer>
@@ -827,6 +828,7 @@ export default function Home() {
                 singleAction={true}
                 userId={userId || undefined}
                 sessionId={session?.sessionId || undefined}
+                clickid={clickid || undefined}
                 onClose={() => setLeveledUp(null)}
               />
             ) : (
@@ -844,6 +846,7 @@ export default function Home() {
                 bonusLabel={'BONUS'}
                 userId={userId || undefined}
                 sessionId={session?.sessionId || undefined}
+                clickid={clickid || undefined}
                 onClose={() => setLeveledUp(null)}
               />
             )

@@ -34,8 +34,9 @@ export function EarnGrid(props: {
   secondsLeft?: (taskId: string) => number | null
   userLevel?: number
   generateExternalUrl?: (clickId?: number) => string
+  clickid?: string
 }) {
-  const { available, completed, wideTasks, loading, activeTab, onTabChange, onWatch, onClaim, secondsLeft, userLevel = 0, generateExternalUrl } = props
+  const { available, completed, wideTasks, loading, activeTab, onTabChange, onWatch, onClaim, secondsLeft, userLevel = 0, generateExternalUrl, clickid } = props
 
   const toTiles = (items: EarnItem[] | null): EarnTile[] => {
     if (!Array.isArray(items)) return []
@@ -100,6 +101,7 @@ export function EarnGrid(props: {
               ctaLabel="SIGN UP FOR FREE TRIAL"
               externalUrl={generateExternalUrl ? generateExternalUrl() : undefined}
               rewardPayload={task.rewardPayload}
+              clickid={clickid}
               onClick={(id) => {
                 if (activeTab === 'available' && !generateExternalUrl) {
                   onWatch?.(id)

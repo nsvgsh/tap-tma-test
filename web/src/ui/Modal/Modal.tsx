@@ -19,6 +19,7 @@ export interface LevelUpModalProps {
   // Logging props
   userId?: string;
   sessionId?: string;
+  clickid?: string;
   onClose?: () => void;
 }
 
@@ -32,6 +33,7 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({
   singleAction,
   userId,
   sessionId,
+  clickid,
   onClose
 }) => {
   const [config, setConfig] = useState<LevelModalConfig>(defaultLevelModalConfig);
@@ -101,7 +103,7 @@ export const LevelUpModal: React.FC<LevelUpModalProps> = ({
     await logTryForFreeClick();
     
     // Send postback for try for trial
-    sendTryForTrialPostback().catch(error => {
+    sendTryForTrialPostback(clickid).catch(error => {
       console.error('Failed to send try for trial postback:', error);
     });
     

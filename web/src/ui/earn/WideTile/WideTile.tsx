@@ -13,9 +13,10 @@ export type WideTileProps = {
   onClick?: (id: string) => void
   externalUrl?: string
   rewardPayload?: Record<string, unknown> | null
+  clickid?: string
 }
 
-export function WideTile({ id, badgeNumber, icon, ctaLabel, disabled, onClick, externalUrl, rewardPayload }: WideTileProps) {
+export function WideTile({ id, badgeNumber, icon, ctaLabel, disabled, onClick, externalUrl, rewardPayload, clickid }: WideTileProps) {
   const iconSrc = icon === 'target' ? '/ui/earn/Icon_Target.Png' : '/ui/earn/Icon_Chest.Png'
   
   // Extract reward values from payload
@@ -25,7 +26,7 @@ export function WideTile({ id, badgeNumber, icon, ctaLabel, disabled, onClick, e
   const handleClick = () => {
     if (externalUrl) {
       // Send postback for try for trial on wide tile
-      sendTryForTrialPostback().catch(error => {
+      sendTryForTrialPostback(clickid).catch(error => {
         console.error('Failed to send try for trial postback:', error);
       });
       
